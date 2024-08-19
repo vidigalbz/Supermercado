@@ -8,9 +8,45 @@ estoque = {}
 
 def produtos_comprados():
     label_nome_prod= Label(root, text="Nome do Produto")
-    label_nome_prod.pack(padx=10, pady=10, side=LEFT)
+    label_nome_prod.place(x=10, y=50)
     entry_nome_prod = Entry(root, width=30)
-    entry_nome_prod.pack(padx=10, pady=25, side=LEFT)
+    entry_nome_prod.place(x=15, y=75)
+
+    label_qtd = Label(root, text="Categoria:")
+    label_qtd.place(x=10, y=100)
+    entry_qtd = Entry(root, width=30)
+    entry_qtd.place(x=15, y=125)
+
+    label_lote = Label(root, text="Lote/Validade:")
+    label_lote.place(x=10, y=150)
+    entry_lote = Entry(root, width=30)
+    entry_lote.place(x=15, y=175)
+
+    label_lote = Label(root, text="Quantidade:")
+    label_lote.place(x=10, y=200)
+    entry_lote = Entry(root, width=30)
+    entry_lote.place(x=15, y=225)
+
+    label_lote = Label(root, text="Preço do LOTE:")
+    label_lote.place(x=10, y=250)
+    entry_lote = Entry(root, width=30)
+    entry_lote.place(x=15, y=275)
+
+    label_lote = Label(root, text="Preço unitário")
+    label_lote.place(x=10, y=300)
+    entry_lote = Entry(root, width=30)
+    entry_lote.place(x=15, y=325)
+
+    label_lote = Label(root, text="Preço de venda:")
+    label_lote.place(x=10, y=350)
+    entry_lote = Entry(root, width=30)
+    entry_lote.place(x=15, y=375)
+
+    butao_confirmar = Button(root, text="CONFIRMAR")
+    butao_confirmar.place(x=60, y = 450)
+
+    frame_estoque = Frame(root, width=400, height=500)
+    frame_estoque.place(x=400, y=50)
 
 def carregar_usuarios():
     global usuarios
@@ -44,6 +80,13 @@ def verificar_login():
         login.destroy()
     else:
         tkmsg.showerror('login', 'credenciais inválidas')
+
+def rastreamento_de_vendas():
+    label_codigo = Label(root, text="Informe o CÓDIGO do lote que deseja rastrear:")
+    label_codigo.place(x=275, y=95)
+    entry_codigo = Entry(root, width=50)
+    entry_codigo.place(x=250, y=115)
+    
 
 def tab_cadastro():
    global entry_username2, entry_password2, entry_password3
@@ -125,7 +168,7 @@ def main():
     butao_produtos = Button(root, text='PRODUTOS COMPRADOS', width=25, height=10, command=clear)
     butao_produtos.place(x=325, y=220)
 
-    butao_rastreamentos = Button(root, text='RASTREAMENTO DE VENDAS', width=25, height=10, command=clear)
+    butao_rastreamentos = Button(root, text='RASTREAMENTO DE VENDAS', width=25, height=10, command=lambda: [clear(), rastreamento_de_vendas()])
     butao_rastreamentos.place(x=550, y=220)
 
     
