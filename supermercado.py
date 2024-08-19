@@ -4,12 +4,19 @@ import json as j
 import os
 
 usuarios = {}
+estoque = {}
+
+def produtos_comprados():
+    label_nome_prod= Label(root, text="Nome do Produto")
+    label_nome_prod.pack(padx=10, pady=10, side=LEFT)
+    entry_nome_prod = Entry(root, width=30)
+    entry_nome_prod.pack(padx=10, pady=25, side=LEFT)
 
 def carregar_usuarios():
     global usuarios
     if os.path.exists("supermercado.json"):
         try:
-            with open("UC5/supermercado.json", "r", encoding="utf-8") as arquivo:
+            with open("supermercado.json", "r", encoding="utf-8") as arquivo:
                 usuarios = j.load(arquivo)
         except j.JSONDecodeError:
             usuarios = {}
@@ -21,7 +28,7 @@ def verficar_cadastro():
         tkmsg.showerror("ERRO", "Usuario já cadastrado")
     elif entry_password2.get() == entry_password3.get():
         usuarios[entry_username2.get()] = entry_password3.get()
-        with open("UC5/supermercado.json" , "w", encoding="utf-8") as file:
+        with open("supermercado.json" , "w", encoding="utf-8") as file:
             j.dump(usuarios, file, indent=2)
         tkmsg.showinfo("SUCESSO", "Cadastro feito com sucesso!")
     else:
@@ -99,6 +106,10 @@ def tab_login():
     button_createAccount = Button(frame_buttons, text='Criar Conta', width=20, command=tab_cadastro)
     button_createAccount.pack(side=RIGHT, padx=20)
 
+def clear():
+    for i in root.winfo_children():
+        i.destroy()
+
 def main():
     global root
     root = Tk()
@@ -107,13 +118,14 @@ def main():
 
     frame_buttonsss = Frame(root)
     
-    butao_estoque = Button(root, text='GERENCIAR ESTOQUE', width=25, height=10, command= None)
+    butao_estoque = Button(root, text='GERENCIAR ESTOQUE', width=25, height=10, command=lambda: [clear(), produtos_comprados()])
     butao_estoque.place(x=100, y=220)
+    
 
-    butao_produtos = Button(root, text='PRODUTOS COMPRADOS', width=25, height=10, command= None)
+    butao_produtos = Button(root, text='PRODUTOS COMPRADOS', width=25, height=10, command=clear)
     butao_produtos.place(x=325, y=220)
 
-    butao_rastreamentos = Button(root, text='RASTREAMENTO DE VENDAS', width=25, height=10, command= None)
+    butao_rastreamentos = Button(root, text='RASTREAMENTO DE VENDAS', width=25, height=10, command=clear)
     butao_rastreamentos.place(x=550, y=220)
 
     
@@ -121,6 +133,7 @@ def main():
     tab_login()    
     root.mainloop()
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
+    carregar_usuarios()
     main()
