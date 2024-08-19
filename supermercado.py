@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import ttk
 import tkinter.messagebox as tkmsg #Importa o tkinter.messagebox como tkmsg
 import json as j
 import os
@@ -6,17 +7,16 @@ import os
 usuarios = {}
 estoque = {}
 
-def produtos_comprados():
-    label_nome_prod= Label(root, text="Nome do Produto")
-    label_nome_prod.pack(padx=10, pady=10, side=LEFT)
-    entry_nome_prod = Entry(root, width=30)
-    entry_nome_prod.pack(padx=10, pady=25, side=LEFT)
+def clear():
+    for i in root.winfo_children():
+        i.destroy()
+    
 
 def carregar_usuarios():
     global usuarios
-    if os.path.exists("supermercado.json"):
+    if os.path.exists("supermercado_usuarios.json"):
         try:
-            with open("supermercado.json", "r", encoding="utf-8") as arquivo:
+            with open("supermercado_usuarios.json", "r", encoding="utf-8") as arquivo:
                 usuarios = j.load(arquivo)
         except j.JSONDecodeError:
             usuarios = {}
@@ -28,7 +28,7 @@ def verficar_cadastro():
         tkmsg.showerror("ERRO", "Usuario já cadastrado")
     elif entry_password2.get() == entry_password3.get():
         usuarios[entry_username2.get()] = entry_password3.get()
-        with open("supermercado.json" , "w", encoding="utf-8") as file:
+        with open("supermercado_usuarios.json" , "w", encoding="utf-8") as file:
             j.dump(usuarios, file, indent=2)
         tkmsg.showinfo("SUCESSO", "Cadastro feito com sucesso!")
     else:
@@ -106,9 +106,76 @@ def tab_login():
     button_createAccount = Button(frame_buttons, text='Criar Conta', width=20, command=tab_cadastro)
     button_createAccount.pack(side=RIGHT, padx=20)
 
-def clear():
-    for i in root.winfo_children():
-        i.destroy()
+def cadastrar_produto():
+    estoque[entry_id_prod.get()] = {"Nome do Produto": entry_nome_prod.get(), 
+                                    "Categoria": entry_categoria.get(), 
+                                    "Lote": entry_lote.get(), 
+                                    "Quantidade": entry_qtd.get(), 
+                                    "Preço do Lote": entry_prclote.get(), 
+                                    "Preço do Unitario": entry_prcuni.get(),
+                                    "Preço de Venda": entry_prcvenda.get()}
+    
+    with open("supermercado_estoque.json" , "w", encoding="utf-8") as file:
+            j.dump(estoque, file)
+            tkmsg.showinfo("SUCESSO", "Cadastro feito com sucesso!")
+
+def tab_estoque():
+    global entry_id_prod, entry_nome_prod, entry_categoria, entry_lote, entry_qtd, entry_prclote, entry_prcuni, entry_prcvenda
+    
+    label_id_prod= Label(root, text="ID")
+    label_id_prod.place(x=10, y=0)
+    entry_id_prod = Entry(root, width=30)
+    entry_id_prod.place(x=15, y=25)
+
+    label_nome_prod= Label(root, text="Nome do Produto")
+    label_nome_prod.place(x=10, y=50)
+    entry_nome_prod = Entry(root, width=30)
+    entry_nome_prod.place(x=15, y=75)
+
+    label_categoria = Label(root, text="Categoria:")
+    label_categoria.place(x=10, y=100)
+    entry_categoria = Entry(root, width=30)
+    entry_categoria.place(x=15, y=125)
+
+    label_lote = Label(root, text="Lote/Validade:")
+    label_lote.place(x=10, y=150)
+    entry_lote = Entry(root, width=30)
+    entry_lote.place(x=15, y=175)
+
+    label_qtd = Label(root, text="Quantidade:")
+    label_qtd.place(x=10, y=200)
+    entry_qtd = Entry(root, width=30)
+    entry_qtd.place(x=15, y=225)
+
+    label_prclote = Label(root, text="Preço do LOTE")
+    label_prclote.place(x=10, y=250)
+    entry_prclote = Entry(root, width=30)
+    entry_prclote.place(x=15, y=275)
+
+    label_prcuni = Label(root, text="Preço Unitário")
+    label_prcuni.place(x=10, y=300)
+    entry_prcuni = Entry(root, width=30)
+    entry_prcuni.place(x=15, y=325)
+
+    label_prcvenda = Label(root, text="Preço de Venda:")
+    label_prcvenda.place(x=10, y=350)
+    entry_prcvenda = Entry(root, width=30)
+    entry_prcvenda.place(x=15, y=375)
+
+    butao_confirmar = Button(root, text="CONFIRMAR", command= cadastrar_produto)
+    butao_confirmar.place(x=60, y = 450)
+
+    tree_estoque = ttk.Treeview(root, columns=("ID", "Nome do Produto", "Categoria", "Lote","Quantidade", "Preço do Lote", "Preço do Unitário", "Preço de Venda"), show="headings")
+    tree_estoque.place(x=400, y=50)
+
+    tree_estoque.heading("ID", text="ID")
+    tree_estoque.heading("Nome do Produto", text="Nome do Produto")
+    tree_estoque.heading("Categoria", text="Categoria")
+    tree_estoque.heading("Lote", text="Lote")
+    tree_estoque.heading("Quantidade", text="Quantidade")
+    tree_estoque.heading("Preço do Lote", text="Preço do Loto")
+    tree_estoque.heading("Preço do Unitário", text="Preço do Unitário")
+    tree_estoque.heading("Preço de Venda", text="Preço de Venda")
 
 def main():
     global root
@@ -118,11 +185,11 @@ def main():
 
     frame_buttonsss = Frame(root)
     
-    butao_estoque = Button(root, text='GERENCIAR ESTOQUE', width=25, height=10, command=lambda: [clear(), produtos_comprados()])
+    butao_estoque = Button(root, text='GERENCIAR ESTOQUE', width=25, height=10, command=lambda: [clear(), tab_estoque()])
     butao_estoque.place(x=100, y=220)
     
 
-    butao_produtos = Button(root, text='PRODUTOS COMPRADOS', width=25, height=10, command=clear)
+    butao_produtos = Button(root, text='PRODUTOS COMPRADOS', width=25, height=10, command=lambda: [clear()])
     butao_produtos.place(x=325, y=220)
 
     butao_rastreamentos = Button(root, text='RASTREAMENTO DE VENDAS', width=25, height=10, command=clear)
