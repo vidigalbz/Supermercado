@@ -7,6 +7,7 @@ usuarios = {}
 estoque = {}
 
 def produtos_comprados():
+    
     label_nome_prod= Label(root, text="Nome do Produto")
     label_nome_prod.place(x=10, y=50)
     entry_nome_prod = Entry(root, width=30)
@@ -48,7 +49,7 @@ def produtos_comprados():
     frame_estoque = Frame(root, width=400, height=500)
     frame_estoque.place(x=400, y=50)
 
-    button_cancel = Button(root, text='cancelar', width=10, command=root.quit)
+    button_cancel = Button(root, text='cancelar', width=10, command=lambda: [clear(), botoes()])
     button_cancel.place(x= 700, y = 600)
     
 
@@ -90,8 +91,9 @@ def rastreamento_de_vendas():
     label_codigo.place(x=275, y=95)
     entry_codigo = Entry(root, width=50)
     entry_codigo.place(x=250, y=115)
-    button_cancel = Button(root, text='cancelar', width=10, command=root.quit)
+    button_cancel = Button(root, text='cancelar', width=10, command=lambda: [clear(), botoes()])
     button_cancel.place(x= 700, y = 600)
+    
     
 
 def tab_cadastro():
@@ -159,12 +161,7 @@ def clear():
     for i in root.winfo_children():
         i.destroy()
 
-def main():
-    global root
-    root = Tk()
-    root.geometry("850x700")
-    root.title("telamuitotopmesmochave")
-
+def botoes():
     frame_buttonsss = Frame(root)
     
     butao_estoque = Button(root, text='GERENCIAR ESTOQUE', width=25, height=10, command=lambda: [clear(), produtos_comprados()])
@@ -177,6 +174,12 @@ def main():
     butao_rastreamentos = Button(root, text='RASTREAMENTO DE VENDAS', width=25, height=10, command=lambda: [clear(), rastreamento_de_vendas()])
     butao_rastreamentos.place(x=550, y=220)
 
+def main():
+    global root
+    root = Tk()
+    root.geometry("850x700")
+    root.title("telamuitotopmesmochave")
+    botoes()
     
     root.withdraw()    
     tab_login()    
