@@ -23,6 +23,24 @@ def carregar_usuarios():
         usuarios = {}
 
 def carregar_estoque():
+    if os.path.exists("supermercado_estoque.json"):
+        try:
+            with open("supermercado_estoque.json", "r", encoding="utf-8") as arquivo:
+                estoque = j.load(arquivo)
+                for i in estoque:
+                    tree_estoque.insert("", "end", values=(i, 
+                                                        estoque[i]["Nome do Produto"], 
+                                                        estoque[i]["Categoria"], 
+                                                        estoque[i]["Lote"], 
+                                                        estoque[i]["Quantidade"], 
+                                                        f"R$ {estoque[i]["Preço do Lote"]}", 
+                                                        f"R$ {estoque[i]["Preço do Unitario"]}", 
+                                                        f"R$ {estoque[i]["Preço de Venda"]}"))
+        except j.JSONDecodeError:
+            estoque = {}
+    else:
+        estoque = {}
+
 
 def verficar_cadastro():
     if entry_username2.get() in usuarios.keys():
@@ -107,21 +125,28 @@ def tab_login():
     button_createAccount.pack(side=RIGHT, padx=20)
 
 def cadastrar_produto():
-    estoque[entry_id_prod.get()] = {"Nome do Produto": entry_nome_prod.get(), 
-                                    "Categoria": entry_categoria.get(), 
-                                    "Lote": entry_lote.get(), 
-                                    "Quantidade": entry_qtd.get(), 
-                                    "Preço do Lote": entry_prclote.get(), 
-                                    "Preço do Unitario": entry_prcuni.get(),
-                                    "Preço de Venda": entry_prcvenda.get()}
+    if "" in (entry_nome_prod.get(), entry_categoria.get(), entry_lote.get(), entry_prclote.get(), entry_prcuni.get(), entry_prcvenda.get()):
+        tkmsg.showerror("ERRO", "Preencha todos os campos")
+    elif entry_id_prod.get().isalpha():
+            tkmsg.showerror("ERRO", "Insira apenas números no ID")
+    elif entry_id_prod.get() in estoque:
+        tkmsg.showerror("ERRO", "Este ID ja existe")
+    else:
+        estoque[entry_id_prod.get()] = {"Nome do Produto": entry_nome_prod.get(), 
+                                        "Categoria": entry_categoria.get(), 
+                                        "Lote": entry_lote.get(), 
+                                        "Quantidade": entry_qtd.get(), 
+                                        "Preço do Lote": entry_prclote.get(), 
+                                        "Preço do Unitario": entry_prcuni.get(),
+                                        "Preço de Venda": entry_prcvenda.get()}
+        
+        tree_estoque.insert("", "end", values=(entry_id_prod.get(), 
+                                            entry_nome_prod.get(), 
+                                            entry_categoria.get(), 
+                                            entry_lote.get(), entry_qtd.get(), f"R$ {entry_prclote.get()}", f"R$ {entry_prcuni.get()}", f"R$ {entry_prcvenda.get()}"))
     
-    tree_estoque.insert("", "end", values=(entry_id_prod.get(), 
-                                           entry_nome_prod.get(), 
-                                           entry_categoria.get(), 
-                                           entry_lote.get(), entry_qtd.get(), f"R$ {entry_prclote.get()}", f"R$ {entry_prcuni.get()}", f"R$ {entry_prcvenda.get()}"))
-   
-    with open("supermercado_estoque.json" , "w", encoding="utf-8") as file:
-            j.dump(estoque, file)
+        with open("supermercado_estoque.json" , "w", encoding="utf-8") as file:
+                j.dump(estoque, file, indent=2)
 
     
 
@@ -197,7 +222,7 @@ def tab_estoque():
 def botoes():
     frame_buttonsss = Frame(root)
    
-    butao_estoque = Button(root, text='GERENCIAR ESTOQUE', width=25, height=10, command=lambda: [clear(), tab_estoque()])
+    butao_estoque = Button(root, text='GERENCIAR ESTOQUE', width=25, height=10, command=lambda: [clear(), tab_estoque(), carregar_estoque()])
     butao_estoque.place(x=100, y=220)
    
  
