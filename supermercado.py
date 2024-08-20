@@ -10,7 +10,6 @@ estoque = {}
 def clear():
     for i in root.winfo_children():
         i.destroy()
-    
 
 def carregar_usuarios():
     global usuarios
@@ -50,7 +49,7 @@ def tab_cadastro():
    login.withdraw()
    cadastro = Toplevel(login)
    cadastro.title('Cadastro')
-   cadastro.geometry('375x667')
+   cadastro.geometry('375x300')
    
    label_username2 = Label(cadastro, text='nome de usuário:')
    label_username2.pack()
@@ -78,7 +77,6 @@ def tab_login():
     login = Toplevel(root)
     login.title('Tela de Login')
     login.geometry('375x270')
-
     
     placeholder_image = PhotoImage(width=1, height=1)
     label_image = Label(login, image=placeholder_image)
@@ -115,12 +113,18 @@ def cadastrar_produto():
                                     "Preço do Unitario": entry_prcuni.get(),
                                     "Preço de Venda": entry_prcvenda.get()}
     
+    tree_estoque.insert("", "end", values=(entry_id_prod.get(), 
+                                           entry_nome_prod.get(), 
+                                           entry_categoria.get(), 
+                                           entry_lote.get(), entry_qtd.get(), f"R$ {entry_prclote.get()}", f"R$ {entry_prcuni.get()}", f"R$ {entry_prcvenda.get()}"))
+   
     with open("supermercado_estoque.json" , "w", encoding="utf-8") as file:
             j.dump(estoque, file)
-            tkmsg.showinfo("SUCESSO", "Cadastro feito com sucesso!")
+
+    
 
 def tab_estoque():
-    global entry_id_prod, entry_nome_prod, entry_categoria, entry_lote, entry_qtd, entry_prclote, entry_prcuni, entry_prcvenda
+    global entry_id_prod, entry_nome_prod, entry_categoria, entry_lote, entry_qtd, entry_prclote, entry_prcuni, entry_prcvenda, tree_estoque
     
     label_id_prod= Label(root, text="ID")
     label_id_prod.place(x=10, y=0)
@@ -165,41 +169,52 @@ def tab_estoque():
     butao_confirmar = Button(root, text="CONFIRMAR", command= cadastrar_produto)
     butao_confirmar.place(x=60, y = 450)
 
-    tree_estoque = ttk.Treeview(root, columns=("ID", "Nome do Produto", "Categoria", "Lote","Quantidade", "Preço do Lote", "Preço do Unitário", "Preço de Venda"), show="headings")
-    tree_estoque.place(x=400, y=50)
+    button_cancel = Button(root, text='CANCELAR', width=10, command=lambda: [clear(), botoes()])
+    button_cancel.place(x=60, y = 500)
 
-    tree_estoque.heading("ID", text="ID")
-    tree_estoque.heading("Nome do Produto", text="Nome do Produto")
-    tree_estoque.heading("Categoria", text="Categoria")
-    tree_estoque.heading("Lote", text="Lote")
-    tree_estoque.heading("Quantidade", text="Quantidade")
-    tree_estoque.heading("Preço do Lote", text="Preço do Loto")
-    tree_estoque.heading("Preço do Unitário", text="Preço do Unitário")
-    tree_estoque.heading("Preço de Venda", text="Preço de Venda")
+    tree_estoque = ttk.Treeview(root, columns=("ID", "Nome do Produto", "Categoria", "Lote","Quantidade", "Preço do Lote", "Preço do Unitário", "Preço de Venda"), show="headings")
+    tree_estoque.place(x=275, y=50)
+    
+    for i in ["ID", "Nome do Produto", "Categoria", "Lote","Quantidade", "Preço do Lote", "Preço do Unitário", "Preço de Venda"]:
+        tree_estoque.heading(f"{i}", text=f"{i}")
+    
+    tree_estoque.column("ID", width=50)
+    tree_estoque.column("Nome do Produto", width=150)
+    tree_estoque.column("Categoria", width=100)
+    tree_estoque.column("Lote", width=100)
+    tree_estoque.column("Quantidade", width=75)
+    tree_estoque.column("Preço do Lote", width=100)
+    tree_estoque.column("Preço do Unitário", width=100)
+    tree_estoque.column("Preço de Venda", width=100)
+
+    scrollbar = Scrollbar(root, orient=VERTICAL, command=tree_estoque.yview)
+    scrollbar.place(x=1050, y=50, height=225)
+
+    tree_estoque.configure(yscrollcommand=scrollbar.set)
+
+def botoes():
+    frame_buttonsss = Frame(root)
+   
+    butao_estoque = Button(root, text='GERENCIAR ESTOQUE', width=25, height=10, command=lambda: [clear(), tab_estoque()])
+    butao_estoque.place(x=100, y=220)
+   
+ 
+    butao_produtos = Button(root, text='PRODUTOS COMPRADOS', width=25, height=10, command=clear)
+    butao_produtos.place(x=325, y=220)
+ 
+    butao_rastreamentos = Button(root, text='RASTREAMENTO DE VENDAS', width=25, height=10, command=lambda: [clear()])
+    butao_rastreamentos.place(x=550, y=220)
 
 def main():
     global root
     root = Tk()
-    root.geometry("850x700")
+    root.geometry("1100x650")
     root.title("telamuitotopmesmochave")
+    botoes()
 
-    frame_buttonsss = Frame(root)
-    
-    butao_estoque = Button(root, text='GERENCIAR ESTOQUE', width=25, height=10, command=lambda: [clear(), tab_estoque()])
-    butao_estoque.place(x=100, y=220)
-    
-
-    butao_produtos = Button(root, text='PRODUTOS COMPRADOS', width=25, height=10, command=lambda: [clear()])
-    butao_produtos.place(x=325, y=220)
-
-    butao_rastreamentos = Button(root, text='RASTREAMENTO DE VENDAS', width=25, height=10, command=clear)
-    butao_rastreamentos.place(x=550, y=220)
-
-    
-    root.withdraw()    
-    tab_login()    
+    root.withdraw()
+    tab_login()
     root.mainloop()
-
 
 if __name__ == "__main__":
     carregar_usuarios()
