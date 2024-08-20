@@ -7,41 +7,42 @@ usuarios = {}
 estoque = {}
 
 def produtos_comprados():
+    global entry_nome_prod, entry_qtd, entry_cate, entry_prclote, entry_prcuni, entry_prcvenda, entry_lote
     
     label_nome_prod= Label(root, text="Nome do Produto")
     label_nome_prod.place(x=10, y=50)
     entry_nome_prod = Entry(root, width=30)
     entry_nome_prod.place(x=15, y=75)
 
-    label_qtd = Label(root, text="Categoria:")
-    label_qtd.place(x=10, y=100)
-    entry_qtd = Entry(root, width=30)
-    entry_qtd.place(x=15, y=125)
+    label_cate = Label(root, text="Categoria:")
+    label_cate.place(x=10, y=100)
+    entry_cate = Entry(root, width=30)
+    entry_cate.place(x=15, y=125)
 
     label_lote = Label(root, text="Lote/Validade:")
     label_lote.place(x=10, y=150)
     entry_lote = Entry(root, width=30)
     entry_lote.place(x=15, y=175)
 
-    label_lote = Label(root, text="Quantidade:")
-    label_lote.place(x=10, y=200)
-    entry_lote = Entry(root, width=30)
-    entry_lote.place(x=15, y=225)
+    label_qtd = Label(root, text="Quantidade:")
+    label_qtd.place(x=10, y=200)
+    entry_qtd = Entry(root, width=30)
+    entry_qtd.place(x=15, y=225)
 
-    label_lote = Label(root, text="Preço do LOTE:")
-    label_lote.place(x=10, y=250)
-    entry_lote = Entry(root, width=30)
-    entry_lote.place(x=15, y=275)
+    label_prclote = Label(root, text="Preço do LOTE:")
+    label_prclote.place(x=10, y=250)
+    entry_prclote = Entry(root, width=30)
+    entry_prclote.place(x=15, y=275)
 
-    label_lote = Label(root, text="Preço unitário")
-    label_lote.place(x=10, y=300)
-    entry_lote = Entry(root, width=30)
-    entry_lote.place(x=15, y=325)
+    label_prcuni = Label(root, text="Preço unitário")
+    label_prcuni.place(x=10, y=300)
+    entry_prcuni = Entry(root, width=30)
+    entry_prcuni.place(x=15, y=325)
 
-    label_lote = Label(root, text="Preço de venda:")
-    label_lote.place(x=10, y=350)
-    entry_lote = Entry(root, width=30)
-    entry_lote.place(x=15, y=375)
+    label_prcvenda = Label(root, text="Preço de venda:")
+    label_prcvenda.place(x=10, y=350)
+    entry_prcvenda = Entry(root, width=30)
+    entry_prcvenda.place(x=15, y=375)
 
     butao_confirmar = Button(root, text="CONFIRMAR")
     butao_confirmar.place(x=60, y = 450)
@@ -52,6 +53,18 @@ def produtos_comprados():
     button_cancel = Button(root, text='cancelar', width=10, command=lambda: [clear(), botoes()])
     button_cancel.place(x= 700, y = 600)
     
+
+def salvarprodutos():
+    if entry_nome_prod.get() in usuarios.keys():
+        tkmsg.showerror("ERRO", "produto já cadastrado")
+    elif entry_nome_prod.get() == entry_lote.get():
+        usuarios[entry_nome_prod.get()] = entry_lote.get()
+        with open("supermercado.json" , "w", encoding="utf-8") as file:
+            j.dump(usuarios, file, indent=2)
+        tkmsg.showinfo("SUCESSO", "Cadastro feito com sucesso!")
+    else:
+        tkmsg.showerror("ERRO", "As senhas devem ser iguais")
+
 
 def carregar_usuarios():
     global usuarios
