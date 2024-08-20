@@ -22,6 +22,8 @@ def carregar_usuarios():
     else:
         usuarios = {}
 
+def carregar_estoque():
+
 def verficar_cadastro():
     if entry_username2.get() in usuarios.keys():
         tkmsg.showerror("ERRO", "Usuario já cadastrado")
