@@ -58,7 +58,6 @@ def verificar_login():
     password = entry_password.get()
 
     if username in usuarios.keys() and password in usuarios.values():
-        tkmsg.showinfo('login', 'login bem-sucedido!')
         root.deiconify()
         login.destroy()
     else:
@@ -199,8 +198,8 @@ def tab_estoque():
     button_cancel = Button(root, text='CANCELAR', width=10, command=lambda: [clear(), botoes()])
     button_cancel.place(x=60, y = 500)
 
-    tree_estoque = ttk.Treeview(root, columns=("ID", "Nome do Produto", "Categoria", "Lote","Quantidade", "Preço do Lote", "Preço do Unitário", "Preço de Venda"), show="headings")
-    tree_estoque.place(x=275, y=50)
+    tree_estoque = ttk.Treeview(root, columns=("ID", "Nome do Produto", "Categoria", "Lote","Quantidade", "Preço do Lote", "Preço do Unitário", "Preço de Venda"), show="headings", height=18)
+    tree_estoque.place(x=275, y=25)
     
     for i in ["ID", "Nome do Produto", "Categoria", "Lote","Quantidade", "Preço do Lote", "Preço do Unitário", "Preço de Venda"]:
         tree_estoque.heading(f"{i}", text=f"{i}")
@@ -215,22 +214,22 @@ def tab_estoque():
     tree_estoque.column("Preço de Venda", width=100)
 
     scrollbar = Scrollbar(root, orient=VERTICAL, command=tree_estoque.yview)
-    scrollbar.place(x=1050, y=50, height=225)
+    scrollbar.place(x=1050, y=25, height=425)
 
     tree_estoque.configure(yscrollcommand=scrollbar.set)
 
 def botoes():
     frame_buttonsss = Frame(root)
    
-    butao_estoque = Button(root, text='GERENCIAR ESTOQUE', width=25, height=10, command=lambda: [clear(), tab_estoque(), carregar_estoque()])
+    butao_estoque = Button(root, text='GERENCIAR ESTOQUE', width=30, height=10, command=lambda: [clear(), tab_estoque()])
     butao_estoque.place(x=100, y=220)
    
  
-    butao_produtos = Button(root, text='PRODUTOS COMPRADOS', width=25, height=10, command=clear)
-    butao_produtos.place(x=325, y=220)
+    butao_produtos = Button(root, text='PRODUTOS COMPRADOS', width=30, height=10, command=clear)
+    butao_produtos.place(x=450, y=220)
  
-    butao_rastreamentos = Button(root, text='RASTREAMENTO DE VENDAS', width=25, height=10, command=lambda: [clear()])
-    butao_rastreamentos.place(x=550, y=220)
+    butao_rastreamentos = Button(root, text='RASTREAMENTO DE VENDAS', width=30, height=10, command=lambda: [clear()])
+    butao_rastreamentos.place(x=795, y=220)
 
 def main():
     global root
