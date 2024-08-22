@@ -63,6 +63,44 @@ def verificar_login():
     else:
         tkmsg.showerror('login', 'credenciais inválidas')
 
+
+def compra_de_produtos():       #Função para realizar a compra de produtos novos
+    teste = Label(root, text="TELA DE COMPRAS", font="Arial 20")
+    teste.place(x=410, y=10)
+
+    label_campo1 = Label(root, text='Informe aqui o ID do produto que deseja comprar:')
+    label_campo1.place(x=10, y=40)
+    entry_campo1 = Entry(root, width=30)
+    entry_campo1.place(x=10, y = 65)
+
+    butaodeselecao = Radiobutton(root, text="LOTE")
+    butaodeselecao.place(x=10, y = 90)
+
+    butaoselecao2 = Radiobutton(root, text="UNIDADE")
+    butaoselecao2.place(x=10, y=115)
+
+    button_cancel2 = Button(root, text='Cancelar', width=20, command=lambda: [clear(), tab_estoque()])
+    button_cancel2.pack(side=RIGHT, padx=20, pady=20)
+
+
+def remocao_de_produtos():       #Função para remover produtos estragados do estoque
+    teste = Label(root, text="TELA DE REMOÇÃO", font="Arial 20")
+    teste.place(x=410, y=10)
+
+    label_campo1 = Label(root, text='Informe aqui o ID do produto que deseja REMOVER:')
+    label_campo1.place(x=10, y=40)
+    entry_campo1 = Entry(root, width=30)
+    entry_campo1.place(x=10, y = 65)
+
+    butaodeselecao = Radiobutton(root, text="LOTE")
+    butaodeselecao.place(x=10, y = 90)
+
+    butaoselecao2 = Radiobutton(root, text="UNIDADE")
+    butaoselecao2.place(x=10, y=115)
+
+    button_cancel2 = Button(root, text='Cancelar', width=20, command=lambda: [clear(), tab_estoque()])
+    button_cancel2.pack(side=RIGHT, padx=20, pady=20)
+
 def tab_cadastro():
    global entry_username2, entry_password2, entry_password3
    login.withdraw()
@@ -200,6 +238,20 @@ def tab_estoque():
 
     label_estoque = Label(root, text="ESTOQUE", font="Arial 20")
     label_estoque.place(x=585, y=10)
+
+    botao_compra = Button(root, text='Comprar produtos', width=30, command=lambda: [clear(), compra_de_produtos()])
+    botao_compra.place(x=830, y=450)
+
+    botaoremover = Button(root, text="Remover produtos", width = 30, command=lambda: [clear(), remocao_de_produtos()])
+    botaoremover.place(x = 600, y = 450)
+
+    
+
+
+
+
+
+
 
     tree_estoque = ttk.Treeview(root, columns=("ID", "Nome do Produto", "Categoria", "Lote","Quantidade", "Preço do Lote", "Preço do Unitário", "Preço de Venda"), show="headings", height=18)
     tree_estoque.place(x=275, y=50)
