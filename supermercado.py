@@ -152,62 +152,56 @@ def cadastrar_produto():
 def tab_estoque():
     global entry_id_prod, entry_nome_prod, entry_categoria, entry_lote, entry_qtd, entry_prclote, entry_prcuni, entry_prcvenda, tree_estoque
     
-    label_id_prod= Label(root, text="ID")
-    label_id_prod.place(x=10, y=0)
-    entry_id_prod = Entry(root, width=30)
-    entry_id_prod.place(x=15, y=25)
-
     label_nome_prod= Label(root, text="Nome do Produto")
-    label_nome_prod.place(x=10, y=50)
+    label_nome_prod.place(x=10, y=25)
     entry_nome_prod = Entry(root, width=30)
-    entry_nome_prod.place(x=15, y=75)
+    entry_nome_prod.place(x=15, y=50)
 
     label_categoria = Label(root, text="Categoria:")
-    label_categoria.place(x=10, y=100)
+    label_categoria.place(x=10, y=75)
     entry_categoria = Entry(root, width=30)
-    entry_categoria.place(x=15, y=125)
+    entry_categoria.place(x=15, y=100)
 
     label_lote = Label(root, text="Lote/Validade:")
-    label_lote.place(x=10, y=150)
+    label_lote.place(x=10, y=125)
     entry_lote = Entry(root, width=30)
-    entry_lote.place(x=15, y=175)
+    entry_lote.place(x=15, y=150)
 
     label_qtd = Label(root, text="Quantidade:")
-    label_qtd.place(x=10, y=200)
+    label_qtd.place(x=10, y=175)
     entry_qtd = Entry(root, width=30)
-    entry_qtd.place(x=15, y=225)
+    entry_qtd.place(x=15, y=200)
 
     label_prclote = Label(root, text="Preço do LOTE")
-    label_prclote.place(x=10, y=250)
+    label_prclote.place(x=10, y=225)
     entry_prclote = Entry(root, width=30)
-    entry_prclote.place(x=15, y=275)
+    entry_prclote.place(x=15, y=250)
 
     label_prcuni = Label(root, text="Preço Unitário")
-    label_prcuni.place(x=10, y=300)
+    label_prcuni.place(x=10, y=275)
     entry_prcuni = Entry(root, width=30)
-    entry_prcuni.place(x=15, y=325)
+    entry_prcuni.place(x=15, y=300)
 
     label_prcvenda = Label(root, text="Preço de Venda:")
-    label_prcvenda.place(x=10, y=350)
+    label_prcvenda.place(x=10, y=325)
     entry_prcvenda = Entry(root, width=30)
-    entry_prcvenda.place(x=15, y=375)
+    entry_prcvenda.place(x=15, y=350)
 
     butao_confirmar = Button(root, text="CONFIRMAR", command= cadastrar_produto)
-    butao_confirmar.place(x=60, y = 450)
+    butao_confirmar.place(x=60, y = 400)
 
     button_cancel = Button(root, text='CANCELAR', width=10, command=lambda: [clear(), botoes()])
-    button_cancel.place(x=60, y = 500)
+    button_cancel.place(x=60, y = 450)
 
     label_estoque = Label(root, text="ESTOQUE", font="Arial 20")
-    label_estoque.place(x=585, y=10)
+    label_estoque.place(x=620, y=10)
 
-    tree_estoque = ttk.Treeview(root, columns=("ID", "Nome do Produto", "Categoria", "Lote","Quantidade", "Preço do Lote", "Preço do Unitário", "Preço de Venda"), show="headings", height=18)
-    tree_estoque.place(x=275, y=50)
+    tree_estoque = ttk.Treeview(root, columns=("Nome do Produto", "Categoria", "Lote","Quantidade", "Preço do Lote", "Preço do Unitário", "Preço de Venda"), show="headings", height=18, )
+    tree_estoque.place(x=325, y=50)
     
-    for i in ["ID", "Nome do Produto", "Categoria", "Lote","Quantidade", "Preço do Lote", "Preço do Unitário", "Preço de Venda"]:
+    for i in ["Nome do Produto", "Categoria", "Lote","Quantidade", "Preço do Lote", "Preço do Unitário", "Preço de Venda"]:
         tree_estoque.heading(f"{i}", text=f"{i}")
     
-    tree_estoque.column("ID", width=50)
     tree_estoque.column("Nome do Produto", width=150)
     tree_estoque.column("Categoria", width=100)
     tree_estoque.column("Lote", width=100)
