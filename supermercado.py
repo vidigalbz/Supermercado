@@ -63,6 +63,25 @@ def verificar_login():
     else:
         tkmsg.showerror('login', 'credenciais inválidas')
 
+def remocao_de_produtos():       #Função para remover produtos estragados do estoque
+    teste = Label(root, text="TELA DE REMOÇÃO", font="Arial 20")
+    teste.place(x=410, y=10)
+ 
+    label_campo1 = Label(root, text='Informe aqui o ID do produto que deseja REMOVER:')
+    label_campo1.place(x=10, y=40)
+    entry_campo1 = Entry(root, width=30)
+    entry_campo1.place(x=10, y = 65)
+ 
+    butaodeselecao = Radiobutton(root, text="LOTE")
+    butaodeselecao.place(x=10, y = 90)
+ 
+    butaoselecao2 = Radiobutton(root, text="UNIDADE")
+    butaoselecao2.place(x=10, y=115)
+ 
+    button_cancel2 = Button(root, text='Cancelar', width=20, command=lambda: [clear(), tab_estoque()])
+    button_cancel2.pack(side=RIGHT, padx=20, pady=20)
+
+
 def tab_cadastro():
    global entry_username2, entry_password2, entry_password3
    login.withdraw()
@@ -126,10 +145,13 @@ def tab_login():
 def cadastrar_produto():
     if "" in (entry_nome_prod.get(), entry_categoria.get(), entry_lote.get(), entry_prclote.get(), entry_prcuni.get(), entry_prcvenda.get()):
         tkmsg.showerror("ERRO", "Preencha todos os campos")
+    
     elif entry_id_prod.get().isalpha():
             tkmsg.showerror("ERRO", "Insira apenas números no ID")
+    
     elif entry_id_prod.get() in estoque:
         tkmsg.showerror("ERRO", "Este ID ja existe")
+    
     else:
         estoque[entry_id_prod.get()] = {"Nome do Produto": entry_nome_prod.get(), 
                                         "Categoria": entry_categoria.get(), 
@@ -193,6 +215,12 @@ def tab_estoque():
     button_cancel = Button(root, text='CANCELAR', width=10, command=lambda: [clear(), botoes()])
     button_cancel.place(x=60, y = 450)
 
+    botao_compra = Button(root, text='Comprar produtos', width=30, command=lambda: [clear(), compra_de_produtos()])
+    botao_compra.place(x=830, y=450)
+ 
+    botaoremover = Button(root, text="Remover produtos", width = 30, command=lambda: [clear(), remocao_de_produtos()])
+    botaoremover.place(x = 600, y = 450)
+
     label_estoque = Label(root, text="ESTOQUE", font="Arial 20")
     label_estoque.place(x=620, y=10)
 
@@ -230,6 +258,7 @@ def botoes():
 
 def main():
     global root
+    
     root = Tk()
     root.geometry("1100x650")
     root.title("telamuitotopmesmochave")
