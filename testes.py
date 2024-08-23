@@ -141,6 +141,28 @@ def rastrear_vendas():
     button_cancel = Button(root, text='CANCELAR', width=10, command=lambda: [clear(), botoes()])
     button_cancel.place(x=60, y = 500)
 
+def remoçao_de_produtos():
+    ab = Label(root, text="REMOÇÃO DE PRODUTOS")
+    ab.place(x = 500, y = 10)
+
+    opçaoLabel = Label(root, text="Digite o ID do item que deseja retirar:")
+    opçaoLabel.place(x = 10, y = 40)
+    opçaoEntry = Entry(root, width=50)
+    opçaoEntry.place(x=10, y = 65 )
+
+    opçao2 = Label(root, text="Informe aqui a quantidade de itens de queseja retirar:")
+    opçao2.place(x=10, y = 90)
+    opçao2 = Entry(root, width=50)
+    opçao2.place(x = 10, y = 115)
+
+    buttonconfirmar = Button(root, text='CONFIRMAR', width=20)
+    buttonconfirmar.place(x = 30, y = 215)
+
+    buttoncancelar = Button(root, text='CANCELAR', width=20)
+    buttoncancelar.place(x = 30, y = 250)
+
+
+
 def compra_de_produtos():
     teste = Label(root, text="TELA DE COMPRAS")
     teste.place(x=500, y=10)
@@ -217,9 +239,9 @@ def tab_estoque():
     botao_compra = Button(root, text='Comprar produtos', width=30, command=lambda: [clear(), compra_de_produtos()])
     botao_compra.place(x=830, y=290)
 
-    botaoremover = Button(root, text="Remover produtos", width = 30, command=None)
+    botaoremover = Button(root, text="Remover produtos", width = 30, command=lambda: [clear(), remoçao_de_produtos()])
     botaoremover.place(x = 600, y = 290)
-
+    
     
     for i in ["ID", "Nome do Produto", "Categoria", "Lote","Quantidade", "Preço do Lote", "Preço do Unitário", "Preço de Venda"]:
         tree_estoque.heading(f"{i}", text=f"{i}")

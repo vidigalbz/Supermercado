@@ -1,0 +1,320 @@
+from tkinter import *
+from tkinter import ttk
+from datetime import datetime
+import tkinter.messagebox as tkmsg #Importa o tkinter.messagebox como tkmsg
+import json as j
+import os
+import re
+
+usuarios = {}
+estoque = {}
+
+def clear():
+    for i in root.winfo_children():
+        i.destroy()
+        
+def carregar_usuarios():
+    global usuarios
+    if os.path.exists("supermercado_usuarios.json"):
+        try:
+            with open("supermercado_usuarios.json", "r", encoding="utf-8") as arquivo:
+                usuarios = j.load(arquivo)
+        except j.JSONDecodeError:
+            usuarios = {}
+    else:
+        usuarios = {}
+
+def carregar_estoque():
+    global estoque
+    if os.path.exists("supermercado_estoque.json"):
+        try:
+            with open("supermercado_estoque.json", "r", encoding="utf-8") as arquivo:
+                estoque = j.load(arquivo)
+        except j.JSONDecodeError:
+            estoque = {}
+    else:
+        estoque = {}
+
+def informacoes_tree_estoque():
+     for i in estoque:
+                    tree_estoque.insert("", "end", values=(i, 
+                                                        estoque[i]["Nome do Produto"], 
+                                                        estoque[i]["Categoria"], 
+                                                        estoque[i]["Lote"], 
+                                                        estoque[i]["Quantidade"], 
+                                                        f"R$ {estoque[i]['Preço do Lote']}", 
+                                                        f"R$ {estoque[i]['Preço do Unitario']}", 
+                                                        f"R$ {estoque[i]['Preço de Venda']}"))
+def verficar_cadastro():
+    if entry_username2.get() in usuarios.keys():
+        tkmsg.showerror("ERRO", "Usuario já cadastrado")
+    elif entry_password2.get() == entry_password3.get():
+        usuarios[entry_username2.get()] = entry_password3.get()
+        with open("supermercado_usuarios.json" , "w", encoding="utf-8") as file:
+            j.dump(usuarios, file, indent=2)
+        tkmsg.showinfo("SUCESSO", "Cadastro feito com sucesso!")
+    else:
+        tkmsg.showerror("ERRO", "As senhas devem ser iguais")
+
+def verificar_login():
+    username = entry_username.get()
+    password = entry_password.get()
+
+    if username in usuarios.keys() and password in usuarios.values():
+        root.deiconify()
+        login.destroy()
+    else:
+        tkmsg.showerror('login', 'credenciais inválidas')
+
+def remocao_de_produtos():
+        selected_item = tree_estoque.selection()
+        
+        item_id = tree_estoque.item(selected_item, "values")[0]
+        str(item_id)
+        del estoque[item_id]
+        tree_estoque.delete(selected_item)
+
+        with open("supermercado_estoque.json" , "w", encoding="utf-8") as file:
+                j.dump(estoque, file, indent=2)
+
+
+def compra_de_produtos():       #Função para realizar a compra de produtos novos
+    teste = Label(root, text="TELA DE COMPRAS", font="Arial 20")
+    teste.place(x=410, y=10)
+ 
+    label_campo1 = Label(root, text='Informe aqui o ID do produto que deseja comprar:')
+    label_campo1.place(x=10, y=40)
+    entry_campo1 = Entry(root, width=30)
+    entry_campo1.place(x=10, y = 65)
+ 
+    butaodeselecao = Radiobutton(root, text="LOTE")
+    butaodeselecao.place(x=10, y = 90)
+ 
+    butaoselecao2 = Radiobutton(root, text="UNIDADE")
+    butaoselecao2.place(x=10, y=115)
+ 
+    button_cancel2 = Button(root, text='Cancelar', width=20, command=lambda: [clear(), tab_estoque(), informacoes_tree_estoque()])
+    button_cancel2.pack(side=RIGHT, padx=20, pady=20)
+
+def tab_cadastro():
+   global entry_username2, entry_password2, entry_password3
+   login.withdraw()
+   cadastro = Toplevel(login)
+   cadastro.title('Cadastro')
+   cadastro.geometry('375x300')
+   
+   label_username2 = Label(cadastro, text='nome de usuário:')
+   label_username2.pack()
+   entry_username2 = Entry(cadastro, width=30)
+   entry_username2.pack(pady=5)
+   
+   label_password2 = Label(cadastro, text='Senha:')
+   label_password2.pack()
+   entry_password2 = Entry(cadastro, show='*', width=30)
+   entry_password2.pack(pady=5)
+   
+   label_confirm = Label(cadastro, text='Confirmar senha')
+   label_confirm.pack()
+   entry_password3 = Entry(cadastro, show='*', width=30)
+   entry_password3.pack(pady=5)
+   
+   button_confirm = Button(cadastro, text='Cadastrar', width=20, command=verficar_cadastro)
+   button_confirm.pack(side=LEFT, padx=20, pady=20)
+
+   button_cancel2 = Button(cadastro, text='Cancelar', width=20, command=lambda: [cadastro.destroy(), login.deiconify()])
+   button_cancel2.pack(side=RIGHT, padx=20, pady=20)
+
+def tab_login():
+    global login, entry_password, entry_username
+    
+    login = Toplevel(root)
+    login.title('Tela de Login')
+    login.geometry('375x270')
+    
+    placeholder_image = PhotoImage(width=1, height=1)
+    label_image = Label(login, image=placeholder_image)
+    label_image.pack(pady=1)
+    
+    label_username = Label(login, text='nome de usuário:')
+    label_username.pack()
+    entry_username = Entry(login, width=30)
+    entry_username.pack(pady=5)
+    
+    label_password = Label(login, text='senha:')
+    label_password.pack()
+    entry_password = Entry(login, show='*', width=30)
+    entry_password.pack(pady=5)
+    
+    frame_buttons = Frame(login)
+    frame_buttons.pack(pady=20)
+    
+    button_login = Button(frame_buttons, text='login', width=10, command=verificar_login)
+    button_login.pack(side=LEFT, padx=10)
+    
+    button_cancel = Button(frame_buttons, text='cancelar', width=10, command=login.quit)
+    button_cancel.pack(side=RIGHT, padx=10)
+    
+    button_createAccount = Button(frame_buttons, text='Criar Conta', width=20, command=tab_cadastro)
+    button_createAccount.pack(side=RIGHT, padx=20)
+
+def cadastrar_produto():
+    data_str = entry_validade.get()
+   
+    try:
+        data_converçao = datetime.strptime(data_str, "%d/%m/%Y")
+        if data_converçao < datetime.now():
+            tkmsg.showerror("ERRO", "Este produto pode ja estar vencido!")
+            return
+    
+    except ValueError:
+            tkmsg.showerror("ERRO", "Formato de data inválido. Por favor, use o formato dd/mm/yyyy.")
+            return
+    if "" in (entry_nome_prod.get(), entry_categoria.get(), entry_validade.get(), entry_prclote.get(), entry_prcuni.get(), entry_prcvenda.get()):
+        tkmsg.showerror("ERRO", "Preencha todos os campos")
+        return
+    if entry_id_prod.get().isalpha():
+            tkmsg.showerror("ERRO", "Insira apenas números no ID")
+            return
+    if entry_id_prod.get() in estoque:
+        tkmsg.showerror("ERRO", "Este ID ja existe")
+        return
+    if entry_qtd.get().isalpha():
+        tkmsg.showerror("ERRO", "Insira apenas números na quantidade")
+        return
+    if entry_prclote.get().isalpha():
+            tkmsg.showerror("ERRO", "Insira apenas números no preço do lote")
+            return
+    if entry_prcuni.get().isalpha():
+            tkmsg.showerror("ERRO", "Insira apenas números no preço do unitário")
+            return
+    if entry_prcvenda.get().isalpha():
+            tkmsg.showerror("ERRO", "Insira apenas números no preço de venda")
+            return
+    if entry_validade.get().isalpha():
+        tkmsg.showerror("ERRO", "Insira apenas números como validade")    
+        return
+    
+    estoque[entry_id_prod.get()] = {"Nome do Produto": entry_nome_prod.get(), 
+                                        "Categoria": entry_categoria.get(), 
+                                        "Lote": entry_validade.get(), 
+                                        "Quantidade": entry_qtd.get(), 
+                                        "Preço do Lote": entry_prclote.get(), 
+                                        "Preço do Unitario": entry_prcuni.get(),
+                                        "Preço de Venda": entry_prcvenda.get()}
+        
+    tree_estoque.insert("", "end", values=(entry_id_prod.get(), 
+                                            entry_nome_prod.get(), 
+                                            entry_categoria.get(), 
+                                            entry_validade.get(), entry_qtd.get(), f"R$ {entry_prclote.get()}", f"R$ {entry_prcuni.get()}", f"R$ {entry_prcvenda.get()}"))
+    
+    with open("supermercado_estoque.json" , "w", encoding="utf-8") as file:
+                j.dump(estoque, file, indent=2)
+
+    
+
+def tab_estoque():
+    global entry_id_prod, entry_nome_prod, entry_categoria, entry_validade, entry_qtd, entry_prclote, entry_prcuni, entry_prcvenda, tree_estoque
+    
+    label_id_prod= Label(root, text="ID")
+    label_id_prod.place(x=10, y=0)
+    entry_id_prod = Entry(root, width=30)
+    entry_id_prod.place(x=15, y=25)
+
+    label_nome_prod= Label(root, text="Nome do Produto")
+    label_nome_prod.place(x=10, y=50)
+    entry_nome_prod = Entry(root, width=30)
+    entry_nome_prod.place(x=15, y=75)
+
+    label_categoria = Label(root, text="Categoria:")
+    label_categoria.place(x=10, y=100)
+    entry_categoria = Entry(root, width=30)
+    entry_categoria.place(x=15, y=125)
+
+    label_validade = Label(root, text="Validade:")
+    label_validade.place(x=10, y=150)
+    entry_validade = Entry(root, width=30)
+    entry_validade.place(x=15, y=175)
+
+    label_qtd = Label(root, text="Quantidade:")
+    label_qtd.place(x=10, y=200)
+    entry_qtd = Entry(root, width=30)
+    entry_qtd.place(x=15, y=225)
+
+    label_prclote = Label(root, text="Preço do LOTE")
+    label_prclote.place(x=10, y=250)
+    entry_prclote = Entry(root, width=30)
+    entry_prclote.place(x=15, y=275)
+
+    label_prcuni = Label(root, text="Preço Unitário")
+    label_prcuni.place(x=10, y=300)
+    entry_prcuni = Entry(root, width=30)
+    entry_prcuni.place(x=15, y=325)
+
+    label_prcvenda = Label(root, text="Preço de Venda:")
+    label_prcvenda.place(x=10, y=350)
+    entry_prcvenda = Entry(root, width=30)
+    entry_prcvenda.place(x=15, y=375)
+
+    butao_confirmar = Button(root, text="CONFIRMAR", command= cadastrar_produto)
+    butao_confirmar.place(x=60, y = 450)
+
+    button_cancel = Button(root, text='CANCELAR', width=10, command=lambda: [clear(), botoes()])
+    button_cancel.place(x=60, y = 500)
+
+    botao_compra = Button(root, text='Comprar produtos', width=30, command=lambda: [clear(), compra_de_produtos()])
+    botao_compra.place(x=830, y=450)
+ 
+    botaoremover = Button(root, text="Remover produtos", width = 30, command=remocao_de_produtos)
+    botaoremover.place(x = 600, y = 450)
+
+    label_estoque = Label(root, text="ESTOQUE", font="Arial 20")
+    label_estoque.place(x=585, y=10)
+
+    tree_estoque = ttk.Treeview(root, columns=("ID","Nome do Produto", "Categoria", "Validade","Quantidade", "Preço do Lote", "Preço do Unitário", "Preço de Venda"), show="headings", height=18 )
+    tree_estoque.place(x=275, y=50)
+    
+    for i in ["ID", "Nome do Produto", "Categoria", "Validade","Quantidade", "Preço do Lote", "Preço do Unitário", "Preço de Venda"]:
+        tree_estoque.heading(f"{i}", text=f"{i}")
+
+    tree_estoque.column("ID", width=50, anchor="center")
+    tree_estoque.column("Nome do Produto", width=150, anchor="center")
+    tree_estoque.column("Categoria", width=100, anchor="center")
+    tree_estoque.column("Validade", width=100, anchor="center")
+    tree_estoque.column("Quantidade", width=75, anchor="center")
+    tree_estoque.column("Preço do Lote", width=100, anchor="center")
+    tree_estoque.column("Preço do Unitário", width=100, anchor="center")
+    tree_estoque.column("Preço de Venda", width=100, anchor="center")
+
+    scrollbar = Scrollbar(root, orient=VERTICAL, command=tree_estoque.yview)
+    scrollbar.place(x=1050, y=49, height=388)
+
+    tree_estoque.configure(yscrollcommand=scrollbar.set)
+
+def botoes():
+    frame_buttonsss = Frame(root)
+   
+    butao_estoque = Button(root, text='GERENCIAR ESTOQUE', width=30, height=10, command=lambda: [clear(), tab_estoque(), informacoes_tree_estoque()])
+    butao_estoque.place(x=100, y=220)
+   
+    butao_produtos = Button(root, text='PRODUTOS COMPRADOS', width=30, height=10, command=clear)
+    butao_produtos.place(x=450, y=220)
+ 
+    butao_rastreamentos = Button(root, text='RASTREAMENTO DE VENDAS', width=30, height=10, command=lambda: [clear()])
+    butao_rastreamentos.place(x=795, y=220)
+
+def main():
+    global root
+    
+    root = Tk()
+    root.geometry("1100x650")
+    root.title("telamuitotopmesmochave")
+    botoes()
+
+    root.withdraw()
+    tab_login()
+    root.mainloop()
+
+if __name__ == "__main__":
+    carregar_usuarios()
+    carregar_estoque()
+    main()
