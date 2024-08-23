@@ -4,6 +4,7 @@ from datetime import datetime
 import tkinter.messagebox as tkmsg #Importa o tkinter.messagebox como tkmsg
 import json as j
 import os
+import re
 
 usuarios = {}
 estoque = {}
@@ -24,11 +25,18 @@ def carregar_usuarios():
         usuarios = {}
 
 def carregar_estoque():
+    global estoque
     if os.path.exists("supermercado_estoque.json"):
         try:
             with open("supermercado_estoque.json", "r", encoding="utf-8") as arquivo:
                 estoque = j.load(arquivo)
-                for i in estoque:
+        except j.JSONDecodeError:
+            estoque = {}
+    else:
+        estoque = {}
+
+def informacoes_tree_estoque():
+     for i in estoque:
                     tree_estoque.insert("", "end", values=(i, 
                                                         estoque[i]["Nome do Produto"], 
                                                         estoque[i]["Categoria"], 
@@ -37,12 +45,6 @@ def carregar_estoque():
                                                         f"R$ {estoque[i]['Preço do Lote']}", 
                                                         f"R$ {estoque[i]['Preço do Unitario']}", 
                                                         f"R$ {estoque[i]['Preço de Venda']}"))
-        except j.JSONDecodeError:
-            estoque = {}
-    else:
-        estoque = {}
-
-
 def verficar_cadastro():
     if entry_username2.get() in usuarios.keys():
         tkmsg.showerror("ERRO", "Usuario já cadastrado")
@@ -66,9 +68,15 @@ def verificar_login():
 
 def remocao_de_produtos():
         selected_item = tree_estoque.selection()
-        print(selected_item)        
-    
-        # Verifica se algum item foi selecionado
+        
+        item_id = tree_estoque.item(selected_item, "values")[0]
+        str(item_id)
+        del estoque[item_id]
+        tree_estoque.delete(selected_item)
+
+        with open("supermercado_estoque.json" , "w", encoding="utf-8") as file:
+                j.dump(estoque, file, indent=2)
+
 
 def compra_de_produtos():       #Função para realizar a compra de produtos novos
     teste = Label(root, text="TELA DE COMPRAS", font="Arial 20")
@@ -85,7 +93,7 @@ def compra_de_produtos():       #Função para realizar a compra de produtos nov
     butaoselecao2 = Radiobutton(root, text="UNIDADE")
     butaoselecao2.place(x=10, y=115)
  
-    button_cancel2 = Button(root, text='Cancelar', width=20, command=lambda: [clear(), tab_estoque(), carregar_estoque()])
+    button_cancel2 = Button(root, text='Cancelar', width=20, command=lambda: [clear(), tab_estoque(), informacoes_tree_estoque()])
     button_cancel2.pack(side=RIGHT, padx=20, pady=20)
 
 def tab_cadastro():
@@ -285,7 +293,7 @@ def tab_estoque():
 def botoes():
     frame_buttonsss = Frame(root)
    
-    butao_estoque = Button(root, text='GERENCIAR ESTOQUE', width=30, height=10, command=lambda: [clear(), tab_estoque(), carregar_estoque()])
+    butao_estoque = Button(root, text='GERENCIAR ESTOQUE', width=30, height=10, command=lambda: [clear(), tab_estoque(), informacoes_tree_estoque()])
     butao_estoque.place(x=100, y=220)
    
     butao_produtos = Button(root, text='PRODUTOS COMPRADOS', width=30, height=10, command=clear)
@@ -308,4 +316,5 @@ def main():
 
 if __name__ == "__main__":
     carregar_usuarios()
+    carregar_estoque()
     main()
