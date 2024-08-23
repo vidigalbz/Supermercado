@@ -4,13 +4,10 @@ from datetime import datetime
 import tkinter.messagebox as tkmsg #Importa o tkinter.messagebox como tkmsg
 import json as j
 import os
-import re
  
 usuarios = {}
 estoque = {}
 
-def testetop():
-     esquema_tela_inicial()
 
 def cleardois():
     for i in login.winfo_children():
@@ -52,16 +49,22 @@ def informacoes_tree_estoque():
                                                         f"R$ {estoque[i]['Preço do Lote']}",
                                                         f"R$ {estoque[i]['Preço do Unitario']}",
                                                         f"R$ {estoque[i]['Preço de Venda']}"))
-def verficar_cadastro():
+                    
+def verficar_cadastro(e):
+    global cargo
+    print(cargo)
     if entry_username2.get() in usuarios.keys():
         tkmsg.showerror("ERRO", "Usuario já cadastrado")
+    elif "" in (entry_username2.get(), entry_password2.get(), entry_password3.get()):
+         tkmsg.showerror("ERRO", "Preencha todos os campos")
     elif entry_password2.get() == entry_password3.get():
-        usuarios[entry_username2.get()] = entry_password3.get()
+        usuarios[entry_username2.get()] = [entry_password3.get(), cargo.get()]
         with open("supermercado_usuarios.json" , "w", encoding="utf-8") as file:
             j.dump(usuarios, file, indent=2)
         tkmsg.showinfo("SUCESSO", "Cadastro feito com sucesso!")
         cleardois()
         tab_login()
+    
     else:
         tkmsg.showerror("ERRO", "As senhas devem ser iguais")
  
@@ -77,13 +80,15 @@ def verificar_login():
  
 def remocao_de_produtos():
         selected_item = tree_estoque.selection()
-       
-        item_id = tree_estoque.item(selected_item, "values")[0]
-        str(item_id)
-        del estoque[item_id]
-        tree_estoque.delete(selected_item)
-        with open("supermercado_estoque.json" , "w", encoding="utf-8") as file:
-                    j.dump(estoque, file, indent=2)
+        if not selected_item:
+             tkmsg.showerror("ERRO", "Não ha nenhum item selecionado")
+        else:
+            item_id = tree_estoque.item(selected_item, "values")[0]
+            str(item_id)
+            del estoque[item_id]
+            tree_estoque.delete(selected_item)
+            with open("supermercado_estoque.json" , "w", encoding="utf-8") as file:
+                        j.dump(estoque, file, indent=2)
 
 def ordem_De_compra():                            #FUNÇÃO DO BOTAO DE ORDEM DE COMPRA
     titulo = Label(root, text="ORDEM DE COMPRA", font="Arial 15")
@@ -112,32 +117,104 @@ def ordem_De_compra():                            #FUNÇÃO DO BOTAO DE ORDEM DE
 def editar_produto():       #Função para realizar a compra de produtos novos
     select_item = tree_estoque.selection()
  
-def tab_cadastro():
-   global entry_username2, entry_password2, entry_password3
+def cadastrar_produto():
+    data_str = entry_validade.get()
    
-   label_username2 = Label(login, text='nome de usuário:')
-   label_username2.pack()
-   entry_username2 = Entry(login, width=30)
-   entry_username2.pack(pady=5)
+    try:
+        data_converçao = datetime.strptime(data_str, "%d/%m/%Y")
+        
+        if data_converçao < datetime.now():
+            tkmsg.showerror("ERRO", "Este produto pode ja estar vencido!")
+            return
+    
+    except ValueError:
+            tkmsg.showerror("ERRO", "Formato de data inválido. Por favor, use o formato dd/mm/yyyy.")
+            return
+    
+    if "" in (entry_nome_prod.get(), entry_categoria.get(), entry_validade.get(), entry_prclote.get(), entry_prcuni.get(), entry_prcvenda.get()):
+        tkmsg.showerror("ERRO", "Preencha todos os campos")
+        return
+    
+    if entry_id_prod.get().isalpha():
+            tkmsg.showerror("ERRO", "Insira apenas números no ID")
+            return
+    
+    if entry_id_prod.get() in estoque:
+        tkmsg.showerror("ERRO", "Este ID ja existe")
+        return
    
-   label_password2 = Label(login, text='Senha:')
-   label_password2.pack()
-   entry_password2 = Entry(login, show='*', width=30)
-   entry_password2.pack(pady=5)
+    if entry_qtd.get().isalpha():
+        tkmsg.showerror("ERRO", "Insira apenas números na quantidade")
+        return
+         
+    if entry_prclote.get().isalpha():
+            tkmsg.showerror("ERRO", "Insira apenas números no preço do lote")
+            return
    
-   label_confirm = Label(login, text='Confirmar senha')
-   label_confirm.pack()
-   entry_password3 = Entry(login, show='*', width=30)
-   entry_password3.pack(pady=5)
+    if entry_prcuni.get().isalpha():
+            tkmsg.showerror("ERRO", "Insira apenas números no preço do unitário")
+            return
    
-   button_confirm = Button(login, text='Cadastrar', width=20, command=verficar_cadastro)
-   button_confirm.pack(side=LEFT, padx=20, pady=20)
+    if entry_prcvenda.get().isalpha():
+            tkmsg.showerror("ERRO", "Insira apenas números no preço de venda")
+            return
+    
+    if entry_validade.get().isalpha():
+        tkmsg.showerror("ERRO", "Insira apenas números como validade")    
+        return
+   
+    estoque[entry_id_prod.get()] = {"Nome do Produto": entry_nome_prod.get(),
+                                        "Categoria": entry_categoria.get(),
+                                        "Lote": entry_validade.get(),
+                                        "Quantidade": entry_qtd.get(),
+                                        "Preço do Lote": entry_prclote.get(),
+                                        "Preço do Unitario": entry_prcuni.get(),
+                                        "Preço de Venda": entry_prcvenda.get()}
+       
+    tree_estoque.insert("", "end", values=(entry_id_prod.get(),
+                                            entry_nome_prod.get(),
+                                            entry_categoria.get(),
+                                            entry_validade.get(), entry_qtd.get(), f"R$ {entry_prclote.get()}", f"R$ {entry_prcuni.get()}", f"R$ {entry_prcvenda.get()}"))
+   
+    with open("supermercado_estoque.json" , "w", encoding="utf-8") as file:
+                j.dump(estoque, file, indent=2)
  
-   button_cancel2 = Button(login, text='Cancelar', width=20, command=lambda: [cleardois(), tab_login()])
-   button_cancel2.pack(side=RIGHT, padx=20, pady=20)
+   
+def tab_cadastro():
+    global entry_username2, entry_password2, entry_password3, gerentin, funcionario, cargo
+    
+    label_username2 = Label(login, text='nome de usuário:')
+    label_username2.pack()
+    entry_username2 = Entry(login, width=30)
+    entry_username2.pack(pady=5)
+    
+    label_password2 = Label(login, text='Senha:')
+    label_password2.pack()
+    entry_password2 = Entry(login, show='*', width=30)
+    entry_password2.pack(pady=5)
+   
+    label_confirm = Label(login, text='Confirmar senha')
+    label_confirm.pack()
+    entry_password3 = Entry(login, show='*', width=30)
+    entry_password3.pack(pady=5)
+
+    cargo = StringVar()
+
+    gerentin = Radiobutton(login, text="Gerente", variable=cargo, value="Gerente")
+    gerentin.place(x=200, y=185)
+
+    funcionario = Radiobutton(login, text="Funcionário", variable=cargo, value="Funcionario")
+    funcionario.place(x=200, y = 160)
+   
+    button_confirm = Button(login, text='Cadastrar', width=20, command=lambda e=cargo: verficar_cadastro(e))
+    button_confirm.pack(side=LEFT, padx=20, pady=20)
+ 
+    button_cancel2 = Button(login, text='Cancelar', width=20, command=lambda: [cleardois(), tab_login()])
+    button_cancel2.pack(side=RIGHT, padx=20, pady=20)
  
 def tab_login():
     global login, entry_password, entry_username
+    
     label_username = Label(login, text='nome de usuário:')
     label_username.pack()
     entry_username = Entry(login, width=30)
@@ -160,60 +237,6 @@ def tab_login():
     button_createAccount = Button(frame_buttons, text='Criar Conta', width=20, command=lambda: [cleardois(), tab_cadastro()])
     button_createAccount.pack(side=RIGHT, padx=20)
  
-def cadastrar_produto():
-    data_str = entry_validade.get()
-   
-    try:
-        data_converçao = datetime.strptime(data_str, "%d/%m/%Y")
-        if data_converçao < datetime.now():
-            tkmsg.showerror("ERRO", "Este produto pode ja estar vencido!")
-            return
-   
-    except ValueError:
-            tkmsg.showerror("ERRO", "Formato de data inválido. Por favor, use o formato dd/mm/yyyy.")
-            return
-    if "" in (entry_nome_prod.get(), entry_categoria.get(), entry_validade.get(), entry_prclote.get(), entry_prcuni.get(), entry_prcvenda.get()):
-        tkmsg.showerror("ERRO", "Preencha todos os campos")
-        return
-    if entry_id_prod.get().isalpha():
-            tkmsg.showerror("ERRO", "Insira apenas números no ID")
-            return
-    if entry_id_prod.get() in estoque:
-        tkmsg.showerror("ERRO", "Este ID ja existe")
-        return
-    if entry_qtd.get().isalpha():
-        tkmsg.showerror("ERRO", "Insira apenas números na quantidade")
-        return
-    if entry_prclote.get().isalpha():
-            tkmsg.showerror("ERRO", "Insira apenas números no preço do lote")
-            return
-    if entry_prcuni.get().isalpha():
-            tkmsg.showerror("ERRO", "Insira apenas números no preço do unitário")
-            return
-    if entry_prcvenda.get().isalpha():
-            tkmsg.showerror("ERRO", "Insira apenas números no preço de venda")
-            return
-    if entry_validade.get().isalpha():
-        tkmsg.showerror("ERRO", "Insira apenas números como validade")    
-        return
-   
-    estoque[entry_id_prod.get()] = {"Nome do Produto": entry_nome_prod.get(),
-                                        "Categoria": entry_categoria.get(),
-                                        "Lote": entry_validade.get(),
-                                        "Quantidade": entry_qtd.get(),
-                                        "Preço do Lote": entry_prclote.get(),
-                                        "Preço do Unitario": entry_prcuni.get(),
-                                        "Preço de Venda": entry_prcvenda.get()}
-       
-    tree_estoque.insert("", "end", values=(entry_id_prod.get(),
-                                            entry_nome_prod.get(),
-                                            entry_categoria.get(),
-                                            entry_validade.get(), entry_qtd.get(), f"R$ {entry_prclote.get()}", f"R$ {entry_prcuni.get()}", f"R$ {entry_prcvenda.get()}"))
-   
-    with open("supermercado_estoque.json" , "w", encoding="utf-8") as file:
-                j.dump(estoque, file, indent=2)
- 
-   
  
 def tab_estoque():
     global entry_id_prod, entry_nome_prod, entry_categoria, entry_validade, entry_qtd, entry_prclote, entry_prcuni, entry_prcvenda, tree_estoque
@@ -309,10 +332,10 @@ def esquema_tela_inicial():                       # O ESQUEMA DE CONSEGUIR REALI
     global login
     login = Tk()
     login.title('Tela de Login')
-    login.geometry('375x270')
+    login.geometry('500x400')
     tab_login()
  
-def main():
+def tab_gerente():
     global root
    
     root = Tk()
@@ -327,4 +350,4 @@ def main():
 if __name__ == "__main__":
     carregar_usuarios()
     carregar_estoque()
-    main()
+    tab_gerente()
