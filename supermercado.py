@@ -115,7 +115,56 @@ def remocao_de_produtos():
  
 def editar_produto():       #Função para realizar a compra de produtos novos
     select_item = tree_estoque.selection()
- 
+    
+    if select_item:
+        item_id = tree_estoque.item(select_item, "values")[0]
+        item_nome = tree_estoque.item(select_item, "values")[1]
+        item_categoria = tree_estoque.item(select_item, "values")[2]
+        item_validade = tree_estoque.item(select_item, "values")[3]
+        item_quantidade = tree_estoque.item(select_item, "values")[4]
+        item_prclote = tree_estoque.item(select_item, "values")[5]
+        item_prclote_div1 = item_prclote.split("R$ ")
+        item_prclote_div2 = item_prclote_div1[1].split(".")
+        item_prclote_div2.pop(1)
+        item_prcuni = tree_estoque.item(select_item, "values")[6]
+        item_prcuni_div1 = item_prcuni.split("R$ ")
+        item_prcuni_div2 = item_prcuni_div1[1].split(".")
+        item_prcuni_div2.pop(1)
+        item_prcvenda = tree_estoque.item(select_item, "values")[7]
+        item_prcvenda_div1 = item_prcvenda.split("R$ ")
+        item_prcvenda_div2 = item_prcvenda_div1[1].split(".")
+        item_prcvenda_div2.pop(1)
+
+        entry_id_prod.delete(0, END)
+        entry_id_prod.insert(0, item_id)
+        entry_id_prod.config(state="disabled")
+
+        entry_nome_prod.delete(0, END)
+        entry_nome_prod.insert(0, item_nome)
+
+        entry_categoria.delete(0, END)
+        entry_categoria.insert(0, item_categoria)
+        
+        entry_validade.delete(0, END)
+        entry_validade.insert(0, item_validade)
+
+        entry_qtd.delete(0, END)
+        entry_qtd.insert(0, item_quantidade)
+        
+        entry_prclote.delete(0, END)
+        entry_prclote.insert(0, item_prclote_div2)
+
+        entry_prcuni.delete(0, END)
+        entry_prcuni.insert(0, item_prcuni_div2)
+
+        entry_prcvenda.delete(0, END)
+        entry_prcvenda.insert(0, item_prcvenda_div2)
+        
+        del estoque[item_id]
+        tree_estoque.delete(select_item)
+        with open("supermercado_estoque.json" , "w", encoding="utf-8") as file:
+                        j.dump(estoque, file, indent=2)
+        
 def cadastrar_produto():
     data_str = entry_validade.get()
    
@@ -167,9 +216,9 @@ def cadastrar_produto():
                                         "Categoria": entry_categoria.get(),
                                         "Validade": entry_validade.get(),
                                         "Quantidade": int(entry_qtd.get()),
-                                        "Preço do Lote": entry_prclote.get(),
-                                        "Preço do Unitario": entry_prcuni.get(),
-                                        "Preço de Venda": entry_prcvenda.get()}
+                                        "Preço do Lote": float(entry_prclote.get()),
+                                        "Preço do Unitario": float(entry_prcuni.get()),
+                                        "Preço de Venda": float(entry_prcvenda.get())}
        
     tree_estoque.insert("", "end", values=(entry_id_prod.get(),
                                             entry_nome_prod.get(),
@@ -178,7 +227,9 @@ def cadastrar_produto():
    
     with open("supermercado_estoque.json" , "w", encoding="utf-8") as file:
                 j.dump(estoque, file, indent=2)
-   
+    
+    entry_id_prod.config(state="normal")
+
 def tab_cadastro():
     global entry_username2, entry_password2, entry_password3, gerentin, funcionario
 
@@ -271,11 +322,11 @@ def tab_estoque():
     entry_prcvenda = Entry(root, width=30)
     entry_prcvenda.place(x=15, y=375)
  
-    butao_confirmar = Button(root, text="CONFIRMAR", command= cadastrar_produto)
+    butao_confirmar = Button(root, text="Cadastrar", command=cadastrar_produto)
     butao_confirmar.place(x=60, y = 450)
  
-    button_cancel = Button(root, text='CANCELAR', width=10, command=lambda: [clear(), botoes()])
-    button_cancel.place(x=60, y = 500)
+    button_cancel = Button(root, text='VOLTAR', width=10, command=lambda: [clear(), botoes()])
+    button_cancel.place(x=965, y = 10)
  
     botao_compra = Button(root, text='Editar produto', width=30, command=editar_produto)
     botao_compra.place(x=830, y=450)
@@ -312,8 +363,8 @@ def tab_ordem_de_compra():
     titulo = Label(root, text="ORDEM DE COMPRA", font=("Arial", 20, "bold"))
     titulo.pack(padx=10, pady=10)
    
-    botaopacancela = Button(root, text="CANCELAR", command= lambda: [clear(), botoes()])
-    botaopacancela.place(x=100, y = 500)
+    botaopacancela = Button(root, text="VOLTAR", command= lambda: [clear(), botoes()])
+    botaopacancela.place(x=870, y = 15)
  
     tree_ordemdecompra = ttk.Treeview(root, columns=("ID", "Nome do Produto", "Categoria","Quantidade", "Motivo", "Status"), show="headings", height=18)
     tree_ordemdecompra.pack(padx=20, pady=20)
@@ -345,7 +396,32 @@ def botoes():
         butao_rastreamentos.place(x=795, y=220)
     
     else:
-         pass
+        labelID = Label(root, text="ID do produto")
+        labelID.place(x = 40, y=100)
+        entryID = Entry(root, width=30)
+        entryID.place(x= 40, y = 120)
+ 
+        labelQTD = Label(root, text="Quantidade:")
+        labelQTD.place(x = 40, y=160)
+        entryQTD = Entry(root, width=30)
+        entryQTD.place(x = 40, y =180)
+ 
+        tree_funcionario = ttk.Treeview(root, columns=("ID","Nome do Produto", "Categoria", "Quantidade", "Preço"), show="headings", height=18 )
+        tree_funcionario.place(x=275, y=50)
+   
+        for i in ["ID", "Nome do Produto", "Categoria", "Quantidade", "Preço"]:
+            tree_funcionario.heading(f"{i}", text=f"{i}")
+ 
+        tree_funcionario.column("ID", width=50, anchor="center")
+        tree_funcionario.column("Nome do Produto", width=150, anchor="center")
+        tree_funcionario.column("Categoria", width=100, anchor="center")
+        tree_funcionario.column("Quantidade", width=75, anchor="center")
+        tree_funcionario.column("Preço", width=100, anchor="center")
+ 
+        scrollbar = Scrollbar(root, orient=VERTICAL, command=tree_funcionario.yview)
+        scrollbar.place(x=1050, y=49, height=388)
+        
+        tree_funcionario.configure(yscrollcommand=scrollbar.set)
 
 def esquema_tela_inicial():                       # O ESQUEMA DE CONSEGUIR REALIZAR O CADASTRO SEM TER QUE ABRIR OUTRA JANELA
     global login
