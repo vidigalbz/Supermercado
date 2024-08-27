@@ -92,10 +92,14 @@ def verificar_login():
     password = entry_password.get()
  
     for i in usuarios:
-        if i == username and usuarios[username] == password:
-            root.deiconify()
-            login.destroy()
- 
+        if i == username:
+            if usuarios[username] == password:
+                root.deiconify()
+                login.destroy()
+                break
+    else:
+        tkmsg.showinfo("ERRO", "Login inválido")
+        
 def remocao_de_produtos():
         selected_item = tree_estoque.selection()
         if not selected_item:
@@ -130,34 +134,35 @@ def cadastrar_produto():
         tkmsg.showerror("ERRO", "Preencha todos os campos")
         return
     
-    if entry_id_prod.get().isalpha():
+    if not entry_id_prod.get().isnumeric():
             tkmsg.showerror("ERRO", "Insira apenas números no ID")
-            return
+            
     
     if entry_id_prod.get() in estoque:
         tkmsg.showerror("ERRO", "Este ID ja existe")
         return
    
-    if entry_qtd.get().isalpha():
+    if not entry_qtd.get().isnumeric():
         tkmsg.showerror("ERRO", "Insira apenas números na quantidade")
         return
          
-    if entry_prclote.get().isalpha():
+    if not entry_prclote.get().isnumeric():
             tkmsg.showerror("ERRO", "Insira apenas números no preço do lote")
             return
    
-    if entry_prcuni.get().isalpha():
+    if not entry_prcuni.get().isnumeric():
             tkmsg.showerror("ERRO", "Insira apenas números no preço do unitário")
             return
    
-    if entry_prcvenda.get().isalpha():
+    if not entry_prcvenda.get().isnumeric():
             tkmsg.showerror("ERRO", "Insira apenas números no preço de venda")
             return
+    validade = entry_validade.get().split("/")
+    for i in validade:
+        if not i.isnumeric():
+            tkmsg.showerror("ERRO", "Insira apenas números como validade")    
+            break
     
-    if entry_validade.get().isalpha():
-        tkmsg.showerror("ERRO", "Insira apenas números como validade")    
-        return
-   
     estoque[entry_id_prod.get()] = {"Nome do Produto": entry_nome_prod.get(),
                                         "Categoria": entry_categoria.get(),
                                         "Validade": entry_validade.get(),
@@ -340,8 +345,7 @@ def botoes():
         butao_rastreamentos.place(x=795, y=220)
     
     else:
-         butao_ = Button(root, text='GERENCIAR ESTOQUE', width=30, height=10)
-         butao_.place(x=100, y=220)
+         pass
 
 def esquema_tela_inicial():                       # O ESQUEMA DE CONSEGUIR REALIZAR O CADASTRO SEM TER QUE ABRIR OUTRA JANELA
     global login
