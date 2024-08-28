@@ -142,6 +142,8 @@ def tab_cadastro():
     button_cancel2 = Button(login, text='Cancelar', width=20, command=lambda: [cleardois(), tab_login()])
     button_cancel2.pack(side=RIGHT, padx=20, pady=20)
 
+# Certifique-se de definir 'login', 'verificar_cadastro', 'cleardois' e 'tab_login' em outro lugar do seu código.
+
     
     
 def tab_login():
