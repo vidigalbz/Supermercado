@@ -21,12 +21,14 @@ def clear():
 
 def voltar():
     yesno = tkmsg.askyesno("Confirmação","Você tem certeza que deseja voltar ao menu principal? Informações não salvas ou produtos com edições não salvas serão perdidos.")
+
     if yesno:
         clear()
         botoes()
 
 def alterar_status():
     select_item = tree_alertas.selection()
+
     if select_item:
         valores = tree_alertas.item(select_item, "values")
         item_id = valores[0]  
@@ -35,36 +37,43 @@ def alterar_status():
         item_quantidade = valores[3]
         item_motivo = valores[4]
         item_status = valores[5]
-        
-        # Alterar o status do item conforme necessário
+
         if item_status == "Pendente":
             item_status = "Em Andamento"
+        
         elif item_status == "Em Andamento":
             tree_alertas.delete(select_item)
-            return  # Sai da função se o item for deletado
+            return     
         
-        # Atualizar o item na Treeview
         tree_alertas.item(select_item, values=(valores[0], item_nome, item_categoria, item_quantidade, item_motivo, item_status))
 
 def carregar_usuarios():
     global usuarios
+    
     if os.path.exists("supermercado_usuarios.json"):
+    
         try:
             with open("supermercado_usuarios.json", "r", encoding="utf-8") as arquivo:
                 usuarios = j.load(arquivo)
+    
         except j.JSONDecodeError:
             usuarios = {}
+    
     else:
         usuarios = {}
  
 def carregar_estoque():
     global estoque
+    
     if os.path.exists("supermercado_estoque.json"):
+    
         try:
             with open("supermercado_estoque.json", "r", encoding="utf-8") as arquivo:
                 estoque = j.load(arquivo)
+    
         except j.JSONDecodeError:
             estoque = {}
+    
     else:
         estoque = {}
  
@@ -80,6 +89,7 @@ def informacoes_tree_estoque():
                                                         f"R$ {estoque[i]['Preço de Venda']}"))
 def informacoes_tree_ordem_de_compra():
      for i in estoque:
+       
         if estoque[i]["Quantidade"] < 30:
             tree_alertas.insert("", "end",values=(i, 
                                                         estoque[i]["Nome do Produto"], 
@@ -104,8 +114,10 @@ def informacoes_tree_ordem_de_compra():
 def verficar_cadastro():
     if entry_username2.get() in usuarios.keys():
         tkmsg.showerror("ERRO", "Usuario já cadastrado")
+
     elif "" in (entry_username2.get(), entry_password2.get(), entry_password3.get()):
          tkmsg.showerror("ERRO", "Preencha todos os campos")
+
     elif entry_password2.get() == entry_password3.get():
         usuarios[entry_username2.get()] = entry_password3.get()
         with open("supermercado_usuarios.json" , "w", encoding="utf-8") as file:
@@ -113,20 +125,25 @@ def verficar_cadastro():
         tkmsg.showinfo("SUCESSO", "Cadastro feito com sucesso!")
         cleardois()
         tab_login() 
+
     else:
         tkmsg.showerror("ERRO", "As senhas devem ser iguais")
 
 def verificar_login():
     global password
+
     username = entry_username.get()
     password = entry_password.get()
  
     for i in usuarios:
+
         if i == username:
+
             if usuarios[username] == password:
                 root.deiconify()
                 login.destroy()
                 break
+
     else:
         tkmsg.showinfo("ERRO", "Login inválido")
         
@@ -547,6 +564,7 @@ def tab_transferir_produtos():
  
      buttoncancel = Button(transferir, text='CANCELAR', width=15, command=transferir.destroy)
      buttoncancel.pack(padx=10, pady=10)
+
 def tab_caixa():
     labeldafaixa = Label(root, text="Supermercado top", background='green', fg="white", font=("Arial",14), width=100)
     labeldafaixa.place(x=0, y=20)
