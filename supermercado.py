@@ -169,6 +169,7 @@ def transferir_produtos():
 
 def editar_produto():       #Função para realizar a compra de produtos novos
     select_item = tree_estoque.selection()
+    botao_cadastrar.config(text="Finalizar Edição")
     
     if select_item:
         item_id = tree_estoque.item(select_item, "values")[0]
@@ -219,6 +220,7 @@ def editar_produto():       #Função para realizar a compra de produtos novos
         
 def cadastrar_produto():
     data_str = entry_validade.get()
+    botao_cadastrar.config(text="Cadastrar Produto")
    
     try:
         data_converçao = datetime.strptime(data_str, "%d/%m/%Y")
@@ -319,9 +321,6 @@ def retirar_produto():
 
         entry_NOME.insert(0, item_nome)
         entry_NOME.config(state="disabled")
-
-def confirmar_retirar_produto():
-     pass
      
 def inserir_produto():
     global valor
@@ -345,7 +344,7 @@ def inserir_produto():
                                                  estoque[entryID.get()]["Preço de Venda"]*float(entryQTD.get())))
         
         valor += estoque[entryID.get()]["Preço de Venda"]*float(entryQTD.get())
-        labelVALOR.config(text=f"Preço Total: R${valor}")
+        label_preçototal.config(text=f"Preço Total: R${valor}")
 
 
         print(valor)
@@ -374,11 +373,11 @@ def tab_cadastro():
     entry_password3 = Entry(login, show='*', width=30)
     entry_password3.pack(pady=5)
 
-    button_confirm = Button(login, text='Cadastrar', width=20, command=verficar_cadastro)
-    button_confirm.pack(padx=10, pady=10)
+    button_cadastrar = Button(login, text='Cadastrar', width=20, command=verficar_cadastro)
+    button_cadastrar.pack(padx=10, pady=10)
  
-    button_cancel2 = Button(login, text='Cancelar', width=20, command=lambda: [cleardois(), tab_login()])
-    button_cancel2.pack(padx=10, pady=10)
+    botao_cancelar = Button(login, text='Cancelar', width=20, command=lambda: [cleardois(), tab_login()])
+    botao_cancelar.pack(padx=10, pady=10)
  
 def tab_login():
     global login, entry_password, entry_username
@@ -399,14 +398,14 @@ def tab_login():
     button_login = Button(frame_buttons, text='login', width=10, command=lambda: [verificar_login(), botoes()])
     button_login.pack(side=LEFT, padx=10)
    
-    button_cancel = Button(frame_buttons, text='cancelar', width=10, command=login.quit)
-    button_cancel.pack(side=RIGHT, padx=10)
+    botao_cancelar = Button(frame_buttons, text='cancelar', width=10, command=login.quit)
+    botao_cancelar.pack(side=RIGHT, padx=10)
    
     button_createAccount = Button(frame_buttons, text='Criar Conta', width=20, command=lambda: [cleardois(), tab_cadastro()])
     button_createAccount.pack(side=RIGHT, padx=20)
  
 def tab_estoque():
-    global entry_id_prod, entry_nome_prod, entry_categoria, entry_validade, entry_qtd, entry_prclote, entry_prcuni, entry_prcvenda, tree_estoque
+    global entry_id_prod, entry_nome_prod, entry_categoria, entry_validade, entry_qtd, entry_prclote, entry_prcuni, entry_prcvenda, tree_estoque, botao_cadastrar
    
     label_id_prod= Label(root, text="ID")
     label_id_prod.place(x=10, y=0)
@@ -433,7 +432,7 @@ def tab_estoque():
     entry_qtd = Entry(root, width=30)
     entry_qtd.place(x=15, y=225)
  
-    label_prclote = Label(root, text="Preço do LOTE")
+    label_prclote = Label(root, text="Preço do Lote")
     label_prclote.place(x=10, y=250)
     entry_prclote = Entry(root, width=30)
     entry_prclote.place(x=15, y=275)
@@ -448,14 +447,14 @@ def tab_estoque():
     entry_prcvenda = Entry(root, width=30)
     entry_prcvenda.place(x=15, y=375)
  
-    butao_confirmar = Button(root, text="Cadastrar", command=cadastrar_produto)
-    butao_confirmar.place(x=60, y = 450)
+    botao_cadastrar = Button(root, text="Cadastrar", command=cadastrar_produto)
+    botao_cadastrar.place(x=60, y = 450)
  
-    button_cancel = Button(root, text='VOLTAR', width=10, command=voltar)
-    button_cancel.place(x=965, y = 10)
+    botao_voltar = Button(root, text='VOLTAR', width=10, command=voltar)
+    botao_voltar.place(x=965, y = 10)
  
-    botao_compra = Button(root, text='Editar produto', width=30, command=editar_produto)
-    botao_compra.place(x=830, y=450)
+    botao_editar = Button(root, text='Editar produto', width=30, command=editar_produto)
+    botao_editar.place(x=830, y=450)
  
     botaoremover = Button(root, text="Remover produto", width = 30, command=lambda: [remocao_de_produtos(tree_estoque)])
     botaoremover.place(x = 600, y = 450)
@@ -546,79 +545,81 @@ def tab_transferir_produtos():
      buttonpaconfirma = Button(transferir, text='CONFIRMAR', width=15, command=transferir_produtos)
      buttonpaconfirma.pack(padx=10, pady=10)
  
-     buttonpaconfirma = Button(transferir, text='CANCELAR', width=15, command=transferir.destroy)
-     buttonpaconfirma.pack(padx=10, pady=10)
+     buttoncancel = Button(transferir, text='CANCELAR', width=15, command=transferir.destroy)
+     buttoncancel.pack(padx=10, pady=10)
+def tab_caixa():
+    labeldafaixa = Label(root, text="Supermercado top", background='green', fg="white", font=("Arial",14), width=100)
+    labeldafaixa.place(x=0, y=20)
+       
+    labelID = Label(root, text="ID do produto")
+    labelID.place(x = 40, y=75)
+    entryID = Entry(root, width=30)
+    entryID.place(x= 40, y = 100)
  
+    labelQTD = Label(root, text="Quantidade:")
+    labelQTD.place(x = 40, y=130)
+    entryQTD = Entry(root, width=30)
+    entryQTD.place(x = 40, y =150)
+
+    label_preçototal = Label(root, text=f"Preço Total: {valor}", font=("Arial", 20, "bold"))
+    label_preçototal.place(x=725, y=475)
+
+    buttonCONFIRM = Button(root, text="CONFIRMAR", command=inserir_produto)
+    buttonCONFIRM.place(x=90, y=225)
+
+    pagamento_var = StringVar()
+    pagamento_var.set(None)
+
+    PIX = Radiobutton(root, text='PIX', variable=pagamento_var, value="Pix")
+    PIX.place(x=755, y=525)
+
+    CARTAO = Radiobutton(root, text="Cartão de Crédito", variable=pagamento_var, value="Cartao de Credito")
+    CARTAO.place(x=755, y=550)
+
+    CARTAODEBITO = Radiobutton(root, text="Cartão de Débito", variable=pagamento_var, value="Cartao de Debito")
+    CARTAODEBITO.place(x=755, y=575)
+        
+    DINHEIRO = Radiobutton(root, text='Dinheiro', variable=pagamento_var,  value="Dinheiro")
+    DINHEIRO.place(x=755, y=600)
+
+    button_finalizarcompra = Button(root, text="FINALIZAR COMPRA", command=None)
+    button_finalizarcompra.place(x=900, y=615)
+
+    tree_funcionario = ttk.Treeview(root, columns=("ID","Nome do Produto", "Categoria", "Quantidade", "Preço do Unitário", "Valor"), show="headings", height=18)
+    tree_funcionario.place(x=275, y=75)
+
+    for i in ["ID", "Nome do Produto", "Categoria", "Quantidade", "Preço do Unitário", "Valor"]:
+        tree_funcionario.heading(f"{i}", text=f"{i}")
+
+    tree_funcionario.column("ID", width=75, anchor="center")
+    tree_funcionario.column("Nome do Produto", width=150, anchor="center")
+    tree_funcionario.column("Categoria", width=120, anchor="center")
+    tree_funcionario.column("Quantidade", width=100, anchor="center")
+    tree_funcionario.column("Preço do Unitário", width=120, anchor="center")
+    tree_funcionario.column("Valor", width=120, anchor="center")
+
+    scrollbar = Scrollbar(root, orient=VERTICAL, command=tree_funcionario.yview)
+    scrollbar.place(x=945, y=75, height=389)
+       
+    tree_funcionario.configure(yscrollcommand=scrollbar.set)
+
 def botoes():
-    global entryID, entryQTD, pagamento_var, tree_funcionario, labelVALOR
+    global entryID, entryQTD, pagamento_var, tree_funcionario, label_preçototal
 
     if password == "123":
-        butao_estoque = Button(root, text='GERENCIAR ESTOQUE', width=30, height=10, command=lambda: [clear(), tab_estoque(), informacoes_tree_estoque()])
+        butao_estoque = Button(root, text='GERENCIAR ESTOQUE', font=("Arial", 10, "bold"), width=30, height=10, command=lambda: [clear(), tab_estoque(), informacoes_tree_estoque()])
         butao_estoque.place(x=100, y=220)
         
-        butao_produtos = Button(root, text='ALERTAS', width=30, height=10, command=lambda: [clear(), tab_alertas(), informacoes_tree_ordem_de_compra()])
-        butao_produtos.place(x=450, y=220)
+        botao_alerta = Button(root, text='ALERTAS',  font=("Arial", 10, "bold"), width=30, height=10, command=lambda: [clear(), tab_alertas(), informacoes_tree_ordem_de_compra()])
+        botao_alerta.place(x=450, y=220)
         
-        butao_rastreamentos = Button(root, text='RASTREAMENTO DE VENDAS', width=30, height=10, command=lambda: [clear()])
-        butao_rastreamentos.place(x=795, y=220)
+        botato_historico = Button(root, text='HISTORICO',  font=("Arial", 10, "bold"), width=30, height=10, command=lambda: [clear()])
+        botato_historico.place(x=795, y=220)
     
-    else:
-        labeldafaixa = Label(root, text="Supermercado top", background='green', fg="white", font=("Arial",14), width=100)
-        labeldafaixa.place(x=0, y=20)
-       
-        labelID = Label(root, text="ID do produto")
-        labelID.place(x = 40, y=75)
-        entryID = Entry(root, width=30)
-        entryID.place(x= 40, y = 100)
- 
-        labelQTD = Label(root, text="Quantidade:")
-        labelQTD.place(x = 40, y=130)
-        entryQTD = Entry(root, width=30)
-        entryQTD.place(x = 40, y =150)
+    else: 
+        tab_caixa()
 
-        labelVALOR = Label(root, text=f"Preço Total: {valor}", font=("Arial", 20, "bold"))
-        labelVALOR.place(x=725, y=475)
- 
-        buttonCONFIRM = Button(root, text="CONFIRMAR", command=inserir_produto)
-        buttonCONFIRM.place(x=90, y=225)
-
-        pagamento_var = StringVar()
-        pagamento_var.set(None)
-       
-        PIX = Radiobutton(root, text='PIX', variable=pagamento_var, value="Pix")
-        PIX.place(x=755, y=525)
- 
-        CARTAO = Radiobutton(root, text="Cartão de Crédito", variable=pagamento_var, value="Cartao de Credito")
-        CARTAO.place(x=755, y=550)
- 
-        CARTAODEBITO = Radiobutton(root, text="Cartão de Débito", variable=pagamento_var, value="Cartao de Debito")
-        CARTAODEBITO.place(x=755, y=575)
- 
-        DINHEIRO = Radiobutton(root, text='Dinheiro', variable=pagamento_var,  value="Dinheiro")
-        DINHEIRO.place(x=755, y=600)
-
-        button_finalizarcompra = Button(root, text="FINALIZAR COMPRA", command=None)
-        button_finalizarcompra.place(x=900, y=615)
-
-        tree_funcionario = ttk.Treeview(root, columns=("ID","Nome do Produto", "Categoria", "Quantidade", "Preço do Unitário", "Valor"), show="headings", height=18)
-        tree_funcionario.place(x=275, y=75)
-   
-        for i in ["ID", "Nome do Produto", "Categoria", "Quantidade", "Preço do Unitário", "Valor"]:
-            tree_funcionario.heading(f"{i}", text=f"{i}")
- 
-        tree_funcionario.column("ID", width=75, anchor="center")
-        tree_funcionario.column("Nome do Produto", width=150, anchor="center")
-        tree_funcionario.column("Categoria", width=120, anchor="center")
-        tree_funcionario.column("Quantidade", width=100, anchor="center")
-        tree_funcionario.column("Preço do Unitário", width=120, anchor="center")
-        tree_funcionario.column("Valor", width=120, anchor="center")
-
-        scrollbar = Scrollbar(root, orient=VERTICAL, command=tree_funcionario.yview)
-        scrollbar.place(x=945, y=75, height=389)
-       
-        tree_funcionario.configure(yscrollcommand=scrollbar.set)
-
-def esquema_tela_inicial():                       # O ESQUEMA DE CONSEGUIR REALIZAR O CADASTRO SEM TER QUE ABRIR OUTRA JANELA
+def start():                       # O ESQUEMA DE CONSEGUIR REALIZAR O CADASTRO SEM TER QUE ABRIR OUTRA JANELA
     global login
 
     login = Tk()
@@ -634,7 +635,7 @@ def main():
     root.title("telamuitotopmesmochave")
 
     root.withdraw()
-    esquema_tela_inicial()
+    start()
     root.mainloop()
 
 if __name__ == "__main__":

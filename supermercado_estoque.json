@@ -1,3 +1,11 @@
 {
-
+  "1": {
+    "Nome do Produto": "Arroz",
+    "Categoria": "Alimento",
+    "Validade": "12/12/2222",
+    "Quantidade": 10,
+    "Pre\u00e7o do Lote": 10.0,
+    "Pre\u00e7o do Unitario": 10.0,
+    "Pre\u00e7o de Venda": 10.0
+  }
 }
