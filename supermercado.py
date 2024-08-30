@@ -26,6 +26,29 @@ def voltar():
         clear()
         botoes()
 
+def alertas():
+    baixa_quantidade = []
+    vencido = []
+
+    for i in estoque:
+
+        if estoque[i]["Quantidade"] < 30:
+            baixa_quantidade.append(i)
+        
+        data_str = estoque[i]["Validade"]
+        data_converçao = datetime.strptime(data_str, "%d/%m/%Y")
+        
+        if data_converçao < datetime.now():
+            vencido.append(i)
+    
+    if len(baixa_quantidade) > 0:
+        baixa_quantidade.sort()
+        tkmsg.showinfo("Produtos Acabando", f"ID: {",".join(baixa_quantidade)}\nVerifique a pagina de alertas para mais informações")
+    
+    if len(vencido) > 0:
+        vencido.sort()
+        tkmsg.showinfo("Produtos Vencidos", f"ID: {",".join(vencido)}\nVerifique a pagina de alertas para mais informações")
+
 def alterar_status():
     select_item = tree_alertas.selection()
 
@@ -46,6 +69,8 @@ def alterar_status():
             return     
         
         tree_alertas.item(select_item, values=(valores[0], item_nome, item_categoria, item_quantidade, item_motivo, item_status))
+    elif not select_item:
+        tkmsg.showerror("ERRO", "Selecione um produto para usar esta função")
 
 def carregar_usuarios():
     global usuarios
@@ -65,12 +90,18 @@ def carregar_usuarios():
 def carregar_estoque():
     global estoque
     
+    dels = []
     if os.path.exists("supermercado_estoque.json"):
     
         try:
             with open("supermercado_estoque.json", "r", encoding="utf-8") as arquivo:
                 estoque = j.load(arquivo)
-    
+                for i in estoque:
+                    if estoque[i]["Quantidade"] <= 0:
+                        dels.append(i)
+                for k in dels:
+                    del estoque[k]
+                     
         except j.JSONDecodeError:
             estoque = {}
     
@@ -87,7 +118,7 @@ def informacoes_tree_estoque():
                                                         f"R$ {estoque[i]['Preço do Lote']}",
                                                         f"R$ {estoque[i]['Preço do Unitario']}",
                                                         f"R$ {estoque[i]['Preço de Venda']}"))
-def informacoes_tree_ordem_de_compra():
+def informacoes_tree_alertas():
      for i in estoque:
        
         if estoque[i]["Quantidade"] < 30:
@@ -142,15 +173,17 @@ def verificar_login():
             if usuarios[username] == password:
                 root.deiconify()
                 login.destroy()
+                alertas()
                 break
-
     else:
         tkmsg.showinfo("ERRO", "Login inválido")
+
+
         
 def remocao_de_produtos(tree):
         selected_item = tree.selection()
         if not selected_item:
-             tkmsg.showerror("ERRO", "Não ha nenhum item selecionado")
+            tkmsg.showerror("ERRO", "Selecione um produto para usar esta função")
         else:
             item_id = tree.item(selected_item, "values")[0]
             str(item_id)
@@ -161,28 +194,33 @@ def remocao_de_produtos(tree):
 
 def transferir_produtos():
     try:
+
         int(entry_QTD.get())
+        if int(entry_QTD.get()) > estoque[entry_ID.get()]["Quantidade"]:
+            tkmsg.showerror("ERRO", "O estoque não possui esta quantidades de items")
+            return
+        
+        else:
+            remover = estoque[entry_ID.get()]["Quantidade"] - int(entry_QTD.get())
+            estoque[entry_ID.get()]["Quantidade"] = remover
+
+            tree_estoque.item(select_item, values=(entry_ID.get(),
+                                                    estoque[entry_ID.get()]["Nome do Produto"], 
+                                                    estoque[entry_ID.get()]["Categoria"],
+                                                    estoque[entry_ID.get()]["Validade"], 
+                                                    remover,
+                                                    estoque[entry_ID.get()]["Preço do Lote"],
+                                                    estoque[entry_ID.get()]["Preço do Unitario"],
+                                                    estoque[entry_ID.get()]["Preço de Venda"]))
+                
+                
+            with open("supermercado_estoque.json" , "w", encoding="utf-8") as file:
+                                    j.dump(estoque, file, indent=2)
+            transferir.destroy()
 
     except ValueError:
          tkmsg.showerror("ERRO", "Insira apenas número inteiros na quantidade")
          return
-    
-    remover = estoque[entry_ID.get()]["Quantidade"] - int(entry_QTD.get())
-    estoque[entry_ID.get()]["Quantidade"] = remover
-
-    tree_estoque.item(select_item, values=(entry_ID.get(),
-                                           estoque[entry_ID.get()]["Nome do Produto"], 
-                                           estoque[entry_ID.get()]["Categoria"],
-                                           estoque[entry_ID.get()]["Validade"], 
-                                           remover,
-                                           estoque[entry_ID.get()]["Preço do Lote"],
-                                           estoque[entry_ID.get()]["Preço do Unitario"],
-                                           estoque[entry_ID.get()]["Preço de Venda"]))
-    
-    with open("supermercado_estoque.json" , "w", encoding="utf-8") as file:
-                        j.dump(estoque, file, indent=2)
-
-    transferir.destroy()
 
 def editar_produto():       #Função para realizar a compra de produtos novos
     select_item = tree_estoque.selection()
@@ -234,6 +272,8 @@ def editar_produto():       #Função para realizar a compra de produtos novos
 
         del estoque[item_id]
         tree_estoque.delete(select_item)
+    elif not select_item:
+        tkmsg.showerror("ERRO", "Selecione um produto para usar esta função")
         
 def cadastrar_produto():
     data_str = entry_validade.get()
@@ -265,7 +305,11 @@ def cadastrar_produto():
     if not entry_qtd.get().isnumeric():
         tkmsg.showerror("ERRO", "Insira apenas números na quantidade")
         return
-  
+    
+    if int(entry_qtd.get()) == 0:
+        tkmsg.showerror("ERRO", "Não insira quantidade como 0")
+        return
+    
     try:
         float(entry_prclote.get())
     
@@ -326,9 +370,11 @@ def cadastrar_produto():
 
 def retirar_produto():
     global select_item
+
     select_item = tree_estoque.selection()
 
     if select_item:
+        tab_transferir_produtos()    
         valores = tree_estoque.item(select_item, "values")
         item_id = valores[0]  
         item_nome = valores[1]
@@ -338,6 +384,9 @@ def retirar_produto():
 
         entry_NOME.insert(0, item_nome)
         entry_NOME.config(state="disabled")
+
+    if not select_item:
+        tkmsg.showerror("ERRO", "Selecione um produto para usar esta função")
      
 def inserir_produto():
     global valor
@@ -476,7 +525,7 @@ def tab_estoque():
     botaoremover = Button(root, text="Remover produto", width = 30, command=lambda: [remocao_de_produtos(tree_estoque)])
     botaoremover.place(x = 600, y = 450)
 
-    butaoderetransferirproduto = Button(root, text="Transferir produto", width=30, command=lambda: [tab_transferir_produtos(), retirar_produto()])
+    butaoderetransferirproduto = Button(root, text="Transferir produto", width=30, command=lambda: [retirar_produto()])
     butaoderetransferirproduto.place(x=370, y = 450)
  
     label_estoque = Label(root, text="ESTOQUE", font=("Arial", 20, "bold"))
@@ -566,6 +615,8 @@ def tab_transferir_produtos():
      buttoncancel.pack(padx=10, pady=10)
 
 def tab_caixa():
+    global entryID, entryQTD, pagamento_var, tree_funcionario, label_preçototal
+
     labeldafaixa = Label(root, text="Supermercado top", background='green', fg="white", font=("Arial",14), width=100)
     labeldafaixa.place(x=0, y=20)
        
@@ -622,18 +673,15 @@ def tab_caixa():
     tree_funcionario.configure(yscrollcommand=scrollbar.set)
 
 def botoes():
-    global entryID, entryQTD, pagamento_var, tree_funcionario, label_preçototal
-
     if password == "123":
         butao_estoque = Button(root, text='GERENCIAR ESTOQUE', font=("Arial", 10, "bold"), width=30, height=10, command=lambda: [clear(), tab_estoque(), informacoes_tree_estoque()])
         butao_estoque.place(x=100, y=220)
         
-        botao_alerta = Button(root, text='ALERTAS',  font=("Arial", 10, "bold"), width=30, height=10, command=lambda: [clear(), tab_alertas(), informacoes_tree_ordem_de_compra()])
+        botao_alerta = Button(root, text='ALERTAS',  font=("Arial", 10, "bold"), width=30, height=10, command=lambda: [clear(), tab_alertas(), informacoes_tree_alertas()])
         botao_alerta.place(x=450, y=220)
         
         botato_historico = Button(root, text='HISTORICO',  font=("Arial", 10, "bold"), width=30, height=10, command=lambda: [clear()])
         botato_historico.place(x=795, y=220)
-    
     else: 
         tab_caixa()
 
