@@ -7,5 +7,14 @@
     "Pre\u00e7o do Lote": 10.0,
     "Pre\u00e7o do Unitario": 10.0,
     "Pre\u00e7o de Venda": 10.0
+  },
+  "2": {
+    "Nome do Produto": "a",
+    "Categoria": "a",
+    "Validade": "12/12/2222",
+    "Quantidade": 2,
+    "Pre\u00e7o do Lote": 2.0,
+    "Pre\u00e7o do Unitario": 2.0,
+    "Pre\u00e7o de Venda": 2.0
   }
 }

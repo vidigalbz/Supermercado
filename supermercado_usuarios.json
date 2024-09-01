@@ -1,4 +1,18 @@
 {
-  "a": "1",
-  "b": "123"
+  "c": {
+    "Senha": "a",
+    "Cargo": "Caixa"
+  },
+  "d": {
+    "Senha": "a",
+    "Cargo": "Gerente"
+  },
+  "a": {
+    "Senha": "1",
+    "Cargo": "Gerente"
+  },
+  "b": {
+    "Senha": "1",
+    "Cargo": "Caixa"
+  }
 }

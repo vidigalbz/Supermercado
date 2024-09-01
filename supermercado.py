@@ -10,7 +10,11 @@ estoque = {}
 historico = {}
 carrinho = {}
 valor = 0
+cont = 1
 
+def deteste():
+     root.withdraw()
+     
 def cleardois():
     for i in login.winfo_children():
         i.destroy()
@@ -150,30 +154,30 @@ def verficar_cadastro():
          tkmsg.showerror("ERRO", "Preencha todos os campos")
 
     elif entry_password2.get() == entry_password3.get():
-        usuarios[entry_username2.get()] = entry_password3.get()
+        usuarios[entry_username2.get()] = {"Senha": entry_password3.get(), "Cargo": cargo_var.get()}
         with open("supermercado_usuarios.json" , "w", encoding="utf-8") as file:
             j.dump(usuarios, file, indent=2)
         tkmsg.showinfo("SUCESSO", "Cadastro feito com sucesso!")
-        cleardois()
-        tab_login() 
+   
 
     else:
         tkmsg.showerror("ERRO", "As senhas devem ser iguais")
 
 def verificar_login():
-    global password
+    global username, password, loginTRUEouFALSE
 
     username = entry_username.get()
     password = entry_password.get()
+    loginTRUEouFALSE = False
  
     for i in usuarios:
 
         if i == username:
 
-            if usuarios[username] == password:
+            if usuarios[username]["Senha"] == password:
                 root.deiconify()
                 login.destroy()
-                alertas()
+                loginTRUEouFALSE = True
                 break
     else:
         tkmsg.showinfo("ERRO", "Login inválido")
@@ -412,42 +416,85 @@ def inserir_produto():
         valor += estoque[entryID.get()]["Preço de Venda"]*float(entryQTD.get())
         label_preçototal.config(text=f"Preço Total: R${valor}")
 
-
-        print(valor)
-
     elif not entryID.get().isnumeric():
         tkmsg.showerror("ERRO", "Insira apenas números como ID.")
 
     else:
-         tkmsg.showerror("ERRO", "Não existe produto com este ID.")            
-         
-def tab_cadastro():
-    global entry_username2, entry_password2, entry_password3, gerentin, funcionario
+         tkmsg.showerror("ERRO", "Não existe produto com este ID.")      
 
-    label_username2 = Label(login, text='nome de usuário:')
+def finalizar_compra():
+    global valor
+    for i in carrinho:
+        notinha = tkmsg.showinfo("COMPRA FINALIZADA", f"Produtos comprados:\nProduto: {carrinho[i]["Nome do Produto"]}, Quantidade: {carrinho[i]["Quantidade"]}, Preço: {carrinho[i]["Preço"]}\nForma de Pagamento:{pagamento_var.get()}\nPreço Total: {valor}")
+
+def tab_historico():
+    global tree_historico
+
+    labeldohistoricofx = Label(root, text="HISTÓRICO DE VENDAS", background='green', fg="white", font=("Arial",14), width=100)
+    labeldohistoricofx.place(x=0, y=20)
+
+    tree_historico = ttk.Treeview(root, columns=("ID","Nome do Produto", "Categoria", "Validade","Quantidade", "Preço do Lote", "Preço do Unitário", "Preço de Venda"), show="headings", height=24 )
+    tree_historico.place(x=50, y=90)
+   
+    for i in ["ID", "Nome do Produto", "Categoria", "Validade","Quantidade", "Preço do Lote", "Preço do Unitário", "Preço de Venda"]:
+        tree_historico.heading(f"{i}", text=f"{i}")
+ 
+    tree_historico.column("ID", width=75, anchor="center")
+    tree_historico.column("Nome do Produto", width=175, anchor="center")
+    tree_historico.column("Categoria", width=125, anchor="center")
+    tree_historico.column("Validade", width=125, anchor="center")
+    tree_historico.column("Quantidade", width=100, anchor="center")
+    tree_historico.column("Preço do Lote", width=125, anchor="center")
+    tree_historico.column("Preço do Unitário", width=125, anchor="center")
+    tree_historico.column("Preço de Venda", width=125, anchor="center")
+ 
+    scrollbar = Scrollbar(root, orient=VERTICAL, command=tree_historico.yview)
+    scrollbar.place(x=1030, y=90, height=500)
+ 
+    tree_historico.configure(yscrollcommand=scrollbar.set)
+
+    botaopacancela = Button(root, text="VOLTAR", command= lambda: [clear(), botoes()], width=25)
+    botaopacancela.place(x=50, y=600)       
+
+def tab_cadastro():
+    global entry_username2, entry_password2, entry_password3, cargo_var
+ 
+    label_username2 = Label(root, text='nome de usuário:')
     label_username2.pack()
-    entry_username2 = Entry(login, width=30)
+    entry_username2 = Entry(root, width=30)
     entry_username2.pack(pady=5)
-    
-    label_password2 = Label(login, text='Senha:')
+   
+    label_password2 = Label(root, text='Senha:')
     label_password2.pack()
-    entry_password2 = Entry(login, show='*', width=30)
+    entry_password2 = Entry(root, show='*', width=30)
     entry_password2.pack(pady=5)
    
-    label_confirm = Label(login, text='Confirmar senha')
+    label_confirm = Label(root, text='Confirmar senha')
     label_confirm.pack()
-    entry_password3 = Entry(login, show='*', width=30)
+    entry_password3 = Entry(root, show='*', width=30)
     entry_password3.pack(pady=5)
-
-    button_cadastrar = Button(login, text='Cadastrar', width=20, command=verficar_cadastro)
+   
+    framebuttttton = Frame(root)
+    framebuttttton.pack(pady=10)
+    
+    button_cadastrar = Button(root, text='Cadastrar', width=20, command=verficar_cadastro)
     button_cadastrar.pack(padx=10, pady=10)
  
-    botao_cancelar = Button(login, text='Cancelar', width=20, command=lambda: [cleardois(), tab_login()])
+    botao_cancelar = Button(root, text='Cancelar', width=20, command=lambda: [clear(), botoes()])
     botao_cancelar.pack(padx=10, pady=10)
  
+    cargo_var = StringVar()
+    cargo_var.set(None)
+
+    radio1 = Radiobutton(framebuttttton, text='Caixa', variable=cargo_var, value="Caixa")
+    radio1.pack()
+ 
+    radio2 = Radiobutton(framebuttttton, text="Gerente", variable=cargo_var, value="Gerente")
+    radio2.pack()
+
 def tab_login():
     global login, entry_password, entry_username
-    
+   
     label_username = Label(login, text='nome de usuário:')
     label_username.pack()
     entry_username = Entry(login, width=30)
@@ -464,11 +511,8 @@ def tab_login():
     button_login = Button(frame_buttons, text='login', width=10, command=lambda: [verificar_login(), botoes()])
     button_login.pack(side=LEFT, padx=10)
    
-    botao_cancelar = Button(frame_buttons, text='cancelar', width=10, command=login.quit)
-    botao_cancelar.pack(side=RIGHT, padx=10)
-   
-    button_createAccount = Button(frame_buttons, text='Criar Conta', width=20, command=lambda: [cleardois(), tab_cadastro()])
-    button_createAccount.pack(side=RIGHT, padx=20)
+    botao_cancelars = Button(frame_buttons, text='cancelar', width=10, command=login.quit)
+    botao_cancelars.pack(side=RIGHT, padx=10)
  
 def tab_estoque():
     global entry_id_prod, entry_nome_prod, entry_categoria, entry_validade, entry_qtd, entry_prclote, entry_prcuni, entry_prcvenda, tree_estoque, botao_cadastrar
@@ -651,7 +695,7 @@ def tab_caixa():
     DINHEIRO = Radiobutton(root, text='Dinheiro', variable=pagamento_var,  value="Dinheiro")
     DINHEIRO.place(x=755, y=600)
 
-    button_finalizarcompra = Button(root, text="FINALIZAR COMPRA", command=None)
+    button_finalizarcompra = Button(root, text="FINALIZAR COMPRA", command=finalizar_compra)
     button_finalizarcompra.place(x=900, y=615)
 
     tree_funcionario = ttk.Treeview(root, columns=("ID","Nome do Produto", "Categoria", "Quantidade", "Preço do Unitário", "Valor"), show="headings", height=18)
@@ -673,21 +717,36 @@ def tab_caixa():
     tree_funcionario.configure(yscrollcommand=scrollbar.set)
 
 def botoes():
-    if password == "123":
-        butao_estoque = Button(root, text='GERENCIAR ESTOQUE', font=("Arial", 10, "bold"), width=30, height=10, command=lambda: [clear(), tab_estoque(), informacoes_tree_estoque()])
-        butao_estoque.place(x=100, y=220)
+    global entryID, entryQTD, pagamento_var, tree_funcionario, label_preçototal, cont
+    if loginTRUEouFALSE:    
+        if username in usuarios:
         
-        botao_alerta = Button(root, text='ALERTAS',  font=("Arial", 10, "bold"), width=30, height=10, command=lambda: [clear(), tab_alertas(), informacoes_tree_alertas()])
-        botao_alerta.place(x=450, y=220)
-        
-        botato_historico = Button(root, text='HISTORICO',  font=("Arial", 10, "bold"), width=30, height=10, command=lambda: [clear()])
-        botato_historico.place(x=795, y=220)
-    else: 
-        tab_caixa()
+            if usuarios[username]["Cargo"] == "Gerente":
+                butao_estoque = Button(root, text='GERENCIAR ESTOQUE', font=("Arial", 10, "bold"), width=30, height=10, command=lambda: [clear(), tab_estoque(), informacoes_tree_estoque()])
+                butao_estoque.place(x=100, y=220)
+                
+                botao_alerta = Button(root, text='ALERTAS',  font=("Arial", 10, "bold"), width=30, height=10, command=lambda: [clear(), tab_alertas(), informacoes_tree_alertas()])
+                botao_alerta.place(x=450, y=220)
+                
+                botato_historico = Button(root, text='HISTORICO',  font=("Arial", 10, "bold"), width=30, height=10, command=lambda: [clear(), tab_historico()])
+                botato_historico.place(x=795, y=220)
 
+                button_createAccount = Button(root, text='Criar Conta', width=20, command=lambda: [clear(), tab_cadastro()])
+                button_createAccount.place(x=900, y=600)
+
+                botaodevoltar = Button(root, text="Voltar ao inicio", command=lambda: [deteste(), start(), clear()], width=20)
+                botaodevoltar.place(x=750, y=600)
+                if cont == 1:
+                    alertas()
+                    cont = 0
+            
+            elif usuarios[username]["Cargo"] == "Caixa":
+                tab_caixa()    
+     
 def start():                       # O ESQUEMA DE CONSEGUIR REALIZAR O CADASTRO SEM TER QUE ABRIR OUTRA JANELA
-    global login
+    global login, cont
 
+    cont = 1
     login = Tk()
     login.title('Tela de Login')
     login.geometry('500x400')
