@@ -30,6 +30,12 @@ def voltar():
         clear()
         botoes()
 
+def verificar_decimais(entry):
+    num = entry.get()
+    div = num.split(".")
+    if len(div[1]) > 2:
+        return True
+
 def alertas():
     baixa_quantidade = []
     vencido = []
@@ -213,9 +219,9 @@ def transferir_produtos():
                                                     estoque[entry_ID.get()]["Categoria"],
                                                     estoque[entry_ID.get()]["Validade"], 
                                                     remover,
-                                                    estoque[entry_ID.get()]["Preço do Lote"],
-                                                    estoque[entry_ID.get()]["Preço do Unitario"],
-                                                    estoque[entry_ID.get()]["Preço de Venda"]))
+                                                    f"R$ {estoque[entry_ID.get()]['Preço do Lote']}",
+                                                    f"R$ {estoque[entry_ID.get()]['Preço do Unitario']}",
+                                                    f"R$ {estoque[entry_ID.get()]['Preço de Venda']}"))
                 
                 
             with open("supermercado_estoque.json" , "w", encoding="utf-8") as file:
@@ -237,18 +243,15 @@ def editar_produto():       #Função para realizar a compra de produtos novos
         item_validade = tree_estoque.item(select_item, "values")[3]
         item_quantidade = tree_estoque.item(select_item, "values")[4]
         item_prclote = tree_estoque.item(select_item, "values")[5]
-        item_prclote_div1 = item_prclote.split("R$ ")
-        item_prclote_div2 = item_prclote_div1[1].split(".")
-        item_prclote_div2.pop(1)
+        item_prclote_div = item_prclote.split("R$ ")
+        item_prclote = item_prclote_div[1]
         item_prcuni = tree_estoque.item(select_item, "values")[6]
-        item_prcuni_div1 = item_prcuni.split("R$ ")
-        item_prcuni_div2 = item_prcuni_div1[1].split(".")
-        item_prcuni_div2.pop(1)
+        item_prcuni_div = item_prcuni.split("R$ ")
+        item_prcuni = item_prcuni_div[1]
         item_prcvenda = tree_estoque.item(select_item, "values")[7]
-        item_prcvenda_div1 = item_prcvenda.split("R$ ")
-        item_prcvenda_div2 = item_prcvenda_div1[1].split(".")
-        item_prcvenda_div2.pop(1)
-
+        item_prcvenda_div = item_prcvenda.split("R$ ")
+        item_prcvenda = item_prcvenda_div[1]
+   
         entry_id_prod.delete(0, END)
         entry_id_prod.insert(0, item_id)
         entry_id_prod.config(state="disabled")
@@ -266,13 +269,13 @@ def editar_produto():       #Função para realizar a compra de produtos novos
         entry_qtd.insert(0, item_quantidade)
         
         entry_prclote.delete(0, END)
-        entry_prclote.insert(0, item_prclote_div2)
+        entry_prclote.insert(0, item_prclote)
 
         entry_prcuni.delete(0, END)
-        entry_prcuni.insert(0, item_prcuni_div2)
+        entry_prcuni.insert(0, item_prcuni)
 
         entry_prcvenda.delete(0, END)
-        entry_prcvenda.insert(0, item_prcvenda_div2)
+        entry_prcvenda.insert(0, item_prcvenda)
 
         del estoque[item_id]
         tree_estoque.delete(select_item)
@@ -322,12 +325,28 @@ def cadastrar_produto():
         return
     
     try:
+        if verificar_decimais(entry_prclote):
+            tkmsg.showerror("ERRO", "Insira apenas 2 números após o ponto")
+            return
+    
+    except IndexError:
+        pass
+    
+    try:
         float(entry_prcuni.get())
 
     except ValueError:
         tkmsg.showerror("ERRO", "Insira apenas números no preço do unitário")
         return
-
+    
+    try:
+        if verificar_decimais(entry_prcuni):
+            tkmsg.showerror("ERRO", "Insira apenas 2 números após o ponto")
+            return
+    
+    except IndexError:
+        pass
+    
     try:
         float(entry_prcvenda.get())
     
@@ -335,6 +354,14 @@ def cadastrar_produto():
         tkmsg.showerror("ERRO", "Insira apenas números no preço de venda")
         return
     
+    try:
+        if verificar_decimais(entry_prcvenda):
+            tkmsg.showerror("ERRO", "Insira apenas 2 números após o ponto")
+            return
+    
+    except IndexError:
+        pass
+
     validade = entry_validade.get().split("/")
 
     for i in validade:
@@ -402,7 +429,7 @@ def inserir_produto():
 
         carrinho[entryID.get()] = {"Nome do Produto": estoque[entryID.get()]["Nome do Produto"],
                                    "Categoria": estoque[entryID.get()]["Categoria"],
-                                   "Quantidade": entryQTD.get(),
+                                   "Quantidade": int(entryQTD.get()),
                                    "Preço Unitario": estoque[entryID.get()]["Preço de Venda"],
                                    "Preço": estoque[entryID.get()]["Preço de Venda"]*float(entryQTD.get())} 
          
@@ -426,6 +453,11 @@ def finalizar_compra():
     global valor
     for i in carrinho:
         notinha = tkmsg.showinfo("COMPRA FINALIZADA", f"Produtos comprados:\nProduto: {carrinho[i]["Nome do Produto"]}, Quantidade: {carrinho[i]["Quantidade"]}, Preço: {carrinho[i]["Preço"]}\nForma de Pagamento:{pagamento_var.get()}\nPreço Total: {valor}")
+    for i in carrinho:
+        for k in estoque:
+            if carrinho[i]["Nome do Produto"] == estoque[k]["Nome do Produto"]:
+                estoque[k]["Quantidade"] -= carrinho[i]["Quantidade"]
+                print(estoque[k])
 
 def tab_historico():
     global tree_historico
@@ -764,6 +796,7 @@ def main():
     root.mainloop()
 
 if __name__ == "__main__":
+    print(datetime.now())
     carregar_usuarios()
     carregar_estoque()
     main()

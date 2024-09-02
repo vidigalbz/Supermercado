@@ -3,18 +3,18 @@
     "Nome do Produto": "Arroz",
     "Categoria": "Alimento",
     "Validade": "12/12/2222",
-    "Quantidade": 10,
+    "Quantidade": 9,
     "Pre\u00e7o do Lote": 10.0,
     "Pre\u00e7o do Unitario": 10.0,
     "Pre\u00e7o de Venda": 10.0
   },
   "2": {
-    "Nome do Produto": "a",
-    "Categoria": "a",
+    "Nome do Produto": "Joelho de 90 graus 25mm",
+    "Categoria": "Conexoes",
     "Validade": "12/12/2222",
-    "Quantidade": 2,
-    "Pre\u00e7o do Lote": 2.0,
-    "Pre\u00e7o do Unitario": 2.0,
+    "Quantidade": 10,
+    "Pre\u00e7o do Lote": 2.23,
+    "Pre\u00e7o do Unitario": 1.0,
     "Pre\u00e7o de Venda": 2.0
   }
 }
