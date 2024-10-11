@@ -8,10 +8,22 @@
     "Cargo": "Gerente"
   },
   "a": {
-    "Senha": "1",
+    "Senha": "a",
     "Cargo": "Gerente"
   },
   "b": {
+    "Senha": "1",
+    "Cargo": "Caixa"
+  },
+  "abc": {
+    "Senha": "1",
+    "Cargo": "Caixa"
+  },
+  "anderson": {
+    "Senha": "2",
+    "Cargo": "Caixa"
+  },
+  "caixa": {
     "Senha": "1",
     "Cargo": "Caixa"
   }

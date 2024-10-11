@@ -1,13 +1,4 @@
 {
-  "2": {
-    "Nome do Produto": "Pedro",
-    "Categoria": "Alimento",
-    "Validade": "12/12/2222",
-    "Quantidade": 900,
-    "Pre\u00e7o do Lote": 10.0,
-    "Pre\u00e7o do Unitario": 10.0,
-    "Pre\u00e7o de Venda": 100.0
-  },
   "1": {
     "Nome do Produto": "a",
     "Categoria": "a",
@@ -16,5 +7,14 @@
     "Pre\u00e7o do Lote": 2.0,
     "Pre\u00e7o do Unitario": 2.0,
     "Pre\u00e7o de Venda": 2.0
+  },
+  "3": {
+    "Nome do Produto": "Banana",
+    "Categoria": "frutas",
+    "Validade": "12/12/2024",
+    "Quantidade": 15,
+    "Pre\u00e7o do Lote": 1.0,
+    "Pre\u00e7o do Unitario": 12.0,
+    "Pre\u00e7o de Venda": 20.0
   }
 }
